@@ -1,0 +1,68 @@
+
+
+services:
+  postgres:
+    image: postgres:16  # 사용할 이미지: PostgreSQL 16 버전
+    environment:
+      POSTGRES_USER: crypto  # DB 사용자명
+      POSTGRES_PASSWORD: crypto  # DB 비밀번호
+      POSTGRES_DB: cryptoflow  # DB 이름
+    ports:
+      - "5432:5432"  # 컨테이너의 포트 5432를 호스트와 연결
+
+# Airflow Webserver 설정
+  airflow-webserver:
+    image: apache/airflow:2.7.0
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://crypto:crypto@postgres/cryptoflow
+      AIRFLOW__CORE__FERNET_KEY: 'random_key'  # 비밀번호 같은 키값
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./airflow_home/dags:/opt/airflow/dags
+      - ./airflow_home/logs:/opt/airflow/logs
+      - ./airflow_home/plugins:/opt/airflow/plugins
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - postgres
+
+  # Airflow Scheduler 설정
+  airflow-scheduler:
+    image: apache/airflow:2.7.0
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://crypto:crypto@postgres/cryptoflow
+      AIRFLOW__CORE__FERNET_KEY: 'random_key'
+    volumes:
+      - ./airflow_home/dags:/opt/airflow/dags
+      - ./airflow_home/logs:/opt/airflow/logs
+      - ./airflow_home/plugins:/opt/airflow/plugins
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - postgres
+  
+  # Airflow 초기화 (DB 스키마 업그레이드 및 사용자 생성)
+  airflow-init:
+    image: apache/airflow:2.7.0
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://crypto:crypto@postgres/cryptoflow
+      AIRFLOW__CORE__FERNET_KEY: 'random_key'
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        airflow db upgrade
+        airflow users create \
+          --username admin \
+          --firstname admin \
+          --lastname admin \
+          --role Admin \
+          --email admin@example.com \
+          --password admin || true
+    depends_on:
+      - postgres
+
+volumes:
+  postgres-data:
