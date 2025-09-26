@@ -4,6 +4,8 @@ from datetime import datetime
 import requests
 
 # 비트코인 가격 데이터를 가져오는 함수
+
+# 배치 단위
 def fetch_bitcoin_price():
     url = "https://api.coindesk.com/v1/bpi/currentprice/BTC.json" ## api 수정 예정
     response = requests.get(url)
@@ -11,6 +13,7 @@ def fetch_bitcoin_price():
     price = data['bpi']['USD']['rate']
     print(f"Current Bitcoin price: ${price}")
     # 여기서 DB에 저장하거나 다른 작업을 할 수 있어.
+
 
 # DAG 설정
 with DAG(
