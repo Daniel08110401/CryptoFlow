@@ -9,6 +9,8 @@ services:
       POSTGRES_DB: cryptoflow  # DB 이름
     ports:
       - "5432:5432"  # 컨테이너의 포트 5432를 호스트와 연결
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
 
 # Airflow Webserver 설정
   airflow-webserver:
