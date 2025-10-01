@@ -181,9 +181,3 @@ ORDER BY ts_event DESC LIMIT 10;
 * [ ] Django REST API 완성
 * [ ] 대시보드 시각화
 * [ ] Slack/Web 알림 이벤트 추가
-
----
-
-👉 이렇게 정리하면 **GitHub README에서 프로젝트 성격과 학습 포인트가 딱 보이게** 됩니다.
-
-원해? 내가 이걸 **markdown 그대로 복사해 붙여넣기** 해서 깃허브에 바로 반영할 수 있게 정리해줄까?
