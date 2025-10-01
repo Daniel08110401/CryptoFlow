@@ -81,9 +81,9 @@ CryptoFlow/
 
 ## 5. 데이터베이스 스키마
 
-데이터는 **Bronze → Silver → Gold** 3단계로 관리됩니다.
+데이터는 **Raw → Mk1 → MK2** 3단계로 관리됩니다.
 
-#### 1. `crypto_24hr_rawingest_landing` (Bronze: API 호출 원본 저장)
+#### 1. `crypto_24hr_rawingest_landing` (Raw: API 호출 원본 저장)
 
 | 컬럼명           | 타입           | 설명                |
 | :------------ | :----------- | :---------------- |
@@ -94,7 +94,7 @@ CryptoFlow/
 | `call_ts`     | TIMESTAMPTZ  | API 호출 시각         |
 | `received_at` | TIMESTAMPTZ  | 수집 완료 시각          |
 
-#### 2. `crypto_24hr_rawingest_events` (Bronze: 이벤트 단위 확장 저장)
+#### 2. `crypto_24hr_rawingest_events` (Raw: 이벤트 단위 확장 저장)
 
 | 컬럼명           | 타입           | 설명                 |
 | :------------ | :----------- | :----------------- |
@@ -106,10 +106,10 @@ CryptoFlow/
 | `call_id`     | BIGINT FK    | landing.id 참조      |
 | `received_at` | TIMESTAMPTZ  | 이벤트 수신 시각          |
 
-#### 3. Silver/Gold 레이어
+#### 3. MK1/MK2 레이어
 
-* Silver: 캔들, 체결, 통계 데이터로 정규화
-* Gold: 트렌드, 변동성, ML 기반 예측 결과 저장
+* MK1: 캔들, 체결, 통계 데이터로 정규화
+* MK2: 트렌드, 변동성, ML 기반 예측 결과 저장
 
 ---
 
@@ -175,9 +175,9 @@ ORDER BY ts_event DESC LIMIT 10;
 
 * [x] Docker 기반 Postgres, Airflow, Django 연결
 * [x] Bronze 테이블 설계
-* [ ] Airflow DAG 구현 (배치 수집)
-* [ ] Kafka Producer & Redis Consumer 구축 (실시간 수집)
-* [ ] Silver → Gold ETL 파이프라인
+* [x] Airflow DAG 구현 (배치 수집)
+* [x] Kafka Producer & Redis Consumer 구축 (실시간 수집)
+* [ ] MK1 → MK2 ETL 파이프라인
 * [ ] Django REST API 완성
 * [ ] 대시보드 시각화
 * [ ] Slack/Web 알림 이벤트 추가
