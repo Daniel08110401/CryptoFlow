@@ -21,7 +21,7 @@ class SpotSnapshot(models.Model):
 
 class Candle(models.Model):
     symbol = models.CharField(max_length=32, db_index=True)        # 'BTC-USD' 등
-    interval = models.CharField(max_length=8)                      # '1h','1d'...
+    interval = models.CharField(max_length=8)                      # '1h','1d'
     open = models.DecimalField(max_digits=20, decimal_places=8)
     high = models.DecimalField(max_digits=20, decimal_places=8)
     low = models.DecimalField(max_digits=20, decimal_places=8)
@@ -45,7 +45,6 @@ class Market24hStat(models.Model):
     class Meta:
         index_together = ("symbol", "ts_event")
 
-
 class Crypto24hRawIngestLanding(models.Model):
     source = models.CharField(max_length=32)
     endpoint = models.CharField(max_length=64)
@@ -58,4 +57,17 @@ class Crypto24hRawIngestLanding(models.Model):
 
     class Meta:
         db_table = "crypto_24hr_rawingest_landing"
+
+class Crypto24hRawIngestEvent(models.Model):
+    source = models.CharField(max_length=32)
+    symbol = models.CharField(max_length=128)
+    ts_event = models.DateTimeField(db_index=True)
+    payload = models.JSONField()
+    call = models.ForeignKey(Crypto24hRawIngestLanding, on_delete=models.CASCADE, db_column="call_id")
+    received_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "crypto_24hr_rawingest_events"
+
+
 

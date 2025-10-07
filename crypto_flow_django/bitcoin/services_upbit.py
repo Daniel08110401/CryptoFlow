@@ -2,10 +2,16 @@
 
 import requests
 import datetime as dt
+import time
 from decimal import Decimal
 from django.utils import timezone as tz
-from .models import RawIngest, SpotSnapshot, Market24hStat, Crypto24hRawIngestLanding
-import time
+from .models import (
+    RawIngest,
+    SpotSnapshot,
+    Market24hStat,
+    Crypto24hRawIngestLanding,
+    Crypto24hRawIngestEvent,
+)
 
 UPBIT_BASE = "https://api.upbit.com/v1"
 DEFAULT_HEADERS = {"Accept": "application/json", "User-Agent": "CryptoFlow/1.0"}
@@ -96,7 +102,7 @@ def save_upbit_ticker_batch(trading_pairs: str) -> dict:
 
     received_at = tz.now()
 
-    Crypto24hRawIngestLanding.objects.create(
+    landing = Crypto24hRawIngestLanding.objects.create(
         source="upbit",
         endpoint="ticker",
         request_params=params,
@@ -109,7 +115,21 @@ def save_upbit_ticker_batch(trading_pairs: str) -> dict:
 
     # If 2xx, return a simple summary to caller
     if 200 <= response.status_code < 300 and isinstance(payload, list):
-        markets = [item.get("market") for item in payload if isinstance(item, dict)]
+        markets = []
+        for it in payload:
+            if not isinstance(it, dict):
+                continue
+            market = it.get("market") or "UNKNOWN"
+            markets.append(market)
+            ts_ms = it.get("trade_timestamp")
+            ts_event = _utc_from_ms(int(ts_ms)) if ts_ms else received_at
+            Crypto24hRawIngestEvent.objects.create(
+                source="upbit",
+                symbol=market,
+                ts_event=ts_event,
+                payload=it,
+                call_id=landing.id,
+            )
         return {"count": len(markets), "markets": markets[:50]}
     else:
         # For non-2xx, surface status to caller
