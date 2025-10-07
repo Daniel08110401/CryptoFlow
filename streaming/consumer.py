@@ -5,8 +5,7 @@
 
 # 현재가(Ticker) & 호가(Orderbook) 데이터: 특정 시점의 상태(Snapshot)이므로 Redis Hash에 최신 값으로 계속 덮어씀
 
-import asyncio
-import json
+
 from datetime import datetime, timezone
 import redis.asyncio as redis
 from aiokafka import AIOKafkaConsumer

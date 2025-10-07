@@ -22,12 +22,12 @@ class Settings(BaseSettings):
     REDIS_PORT: int = 6379
 
     # Pydantic-settings의 설정 클래스
-    # .env 파일을 읽어서 환경 변수를 로드하도록 설정합니다.
+    # .env 파일을 읽어서 환경 변수를 로드하도록 설정
     model_config = SettingsConfigDict(
         env_file=".env", 
         env_file_encoding='utf-8',
         extra='ignore' # .env 파일에 추가적인 변수가 있어도 무시
     )
 
-# 설정 객체를 인스턴스화하여 다른 파일에서 import하여 사용할 수 있도록 합니다.
+# 설정 객체를 인스턴스화하여 다른 파일에서 import하여 사용 가능
 settings = Settings()
