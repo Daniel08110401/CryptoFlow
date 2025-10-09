@@ -48,44 +48,89 @@ class UpbitWebsocketProducer:
             "orderbook": UpbitOrderbookSchema,
         }
 
+    # async def _handle_message(self, message: str):
+    #     """
+    #     수신된 메시지를 파싱, 검증하고 적절한 Kafka 토픽으로 전송
+    #     """
+    #     try:
+    #         logging.info("--> STEP 1: Received message from Upbit.")
+
+    #         # logging.info(f"RAW DATA: {message}") 
+
+    #         # 1.  JSON 딕셔너리로 파싱
+    #         raw_data = json.loads(message)
+            
+    #         # 2. 'ty' 필드로 메시지 타입 확인
+    #         msg_type = raw_data.get("ty")
+            
+    #         # 3. 타입에 맞는 스키마를 맵에서 가져오기
+    #         SchemaModel = self._schema_map.get(msg_type)
+            
+    #         if not SchemaModel:
+    #             # 처리하기로 한 타입이 아니면 무시
+    #             return
+
+    #         # 4. 해당 스키마로 데이터 검증
+    #         data = SchemaModel.model_validate(raw_data)
+            
+    #         # 데이터 타입에 맞는 토픽을 가져옴
+    #         topic = self._topic_map.get(type(data))
+    #         if not topic:
+    #             logging.warning(f"No topic mapping for data type: {type(data)}")
+    #             return
+            
+    #         logging.info(f"--> STEP 2: Sending validated '{data.type}' data for {data.symbol} to Kafka topic '{topic}'.")
+
+    #         await self._producer.send_and_wait(
+    #             topic, 
+    #             data.model_dump_json().encode('utf-8')
+    #         )
+
+    #         logging.info("--> STEP 3: Successfully sent message to Kafka.")
+            
+    #     except ValidationError as e:
+    #         #print(f"Validation Error: {e}\nRaw Message: {message[:200]}...")
+    #         logging.error(f"Validation Error: {e}")
+    #     except Exception as e:
+    #         # 더 자세한 에러를 볼 수 있도록 수정
+    #         logging.error(f"An unexpected error occurred in producer: {e.__class__.__name__} - {e}", exc_info=True)
     async def _handle_message(self, message: str):
         """
         수신된 메시지를 파싱, 검증하고 적절한 Kafka 토픽으로 전송
         """
         try:
-            # 1.  JSON 딕셔너리로 파싱
+            logging.info("--> STEP 1: Received message from Upbit.")
+            
             raw_data = json.loads(message)
+            msg_type = raw_data.get("type") # 'ty'가 아니라 'type'일 수 있으므로 확인
             
-            # 2. 'ty' 필드로 메시지 타입 확인
-            msg_type = raw_data.get("ty")
-            
-            # 3. 타입에 맞는 스키마를 맵에서 가져오기
             SchemaModel = self._schema_map.get(msg_type)
             
-            if not SchemaModel:
-                # 처리하기로 한 타입이 아니면 무시
-                return
-
-            # 4. 해당 스키마로 데이터 검증
-            data = SchemaModel.model_validate(raw_data)
-            
-            # 데이터 타입에 맞는 토픽을 가져옴
-            topic = self._topic_map.get(type(data))
-            if not topic:
-                print(f"No topic mapping for data type: {type(data)}")
-                return
-            
-            await self._producer.send_and_wait(
-                topic, 
-                data.model_dump_json().encode('utf-8')
-            )
+            if SchemaModel:
+                # 스키마가 존재하면 검증 및 처리 진행
+                data = SchemaModel.model_validate(raw_data)
+                
+                topic = self._topic_map.get(type(data))
+                if not topic:
+                    logging.warning(f"No topic mapping for data type: {type(data)}")
+                    return
+                
+                logging.info(f"--> STEP 2: Sending validated '{data.type}' data for {data.symbol} to Kafka topic '{topic}'.")
+                
+                await self._producer.send_and_wait(
+                    topic, 
+                    data.model_dump_json().encode('utf-8')
+                )
+                
+                logging.info("--> STEP 3: Successfully sent message to Kafka.")
+            else:
+                # 스키마가 없는 메시지는 로그를 남기고 무시
+                logging.warning(f"--> SKIPPING: No schema found for message type '{msg_type}'. Raw data: {message[:300]}")
             
         except ValidationError as e:
-            #print(f"Validation Error: {e}\nRaw Message: {message[:200]}...")
-            logging.error(f"Validation Error: {e}")
+            logging.error(f"Validation Error: {e}\nRaw Message: {message[:300]}...")
         except Exception as e:
-            # 더 자세한 에러를 볼 수 있도록 수정
-            print(f"An unexpected error occurred in producer: {e.__class__.__name__} - {e}")
+            logging.error(f"An unexpected error occurred in producer: {e.__class__.__name__} - {e}", exc_info=True)
 
     async def run(self):
         """
@@ -106,16 +151,16 @@ class UpbitWebsocketProducer:
                     #print("WebSocket connected. Sending subscription request...")
                     logging.info("WebSocket connected, Sending subscription request")
                     await websocket.send(json.dumps(subscribe_message))
-                    print("Subscription request sent.")
+                    logging.info("Subscription request sent.")
                     
                     async for message in websocket:
                         await self._handle_message(message)
                         
             except ConnectionClosed as e:
-                print(f"WebSocket connection closed: {e}. Reconnecting in 5 seconds...")
+                logging.error(f"WebSocket connection closed: {e}. Reconnecting in 5 seconds...")
                 await asyncio.sleep(5)
             except Exception as e:
-                print(f"An error occurred: {e}. Reconnecting in 5 seconds...")
+                logging.error(f"An error occurred in run loop: {e.__class__.__name__} - {e}. Reconnecting in 5 seconds...")
                 await asyncio.sleep(5)
                 
     async def close(self):

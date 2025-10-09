@@ -30,9 +30,10 @@ class TradeDataConsumer:
             settings.KAFKA_ORDERBOOK_TOPIC,
         ]
         self._consumer = AIOKafkaConsumer(
-            *topics, # 여러 토픽을 동시에 구독
+            *topics, 
             bootstrap_servers=settings.KAFKA_BOOTSTRAP_SERVERS,
-            group_id="crypto-data-group" # 컨슈머 그룹 ID
+            group_id="crypto-data-group",
+            auto_offset_reset='earliest'
         )
         self._redis_client = redis.from_url(
             f"redis://{settings.REDIS_HOST}:{settings.REDIS_PORT}"
@@ -79,10 +80,52 @@ class TradeDataConsumer:
             }
         )
 
+    # async def run(self):
+    #     """
+    #     Kafka Consumer를 시작하고 메시지를 지속적으로 처리
+    #     """
+    #     logging.info("Starting Kafka consumer...")
+    #     await self._consumer.start()
+        
+    #     schema_map = {
+    #         "trade": UpbitTradeSchema,
+    #         "ticker": UpbitTickerSchema,
+    #         "orderbook": UpbitOrderbookSchema,
+    #     }
+
+    #     try:
+    #         # 이제 메시지를 처리하는 부분만 루프를 돕니다.
+    #         async for msg in self._consumer:
+    #             try:
+    #                 raw_data = json.loads(msg.value.decode('utf-8'))
+    #                 msg_type = raw_data.get("type")
+    #                 SchemaModel = schema_map.get(msg_type)
+                    
+    #                 if not SchemaModel:
+    #                     continue
+                        
+    #                 data = SchemaModel.model_validate(raw_data)
+                    
+    #                 if isinstance(data, UpbitTradeSchema):
+    #                     await self._process_trade(data)
+    #                 elif isinstance(data, UpbitTickerSchema):
+    #                     await self._process_ticker(data)
+    #                 elif isinstance(data, UpbitOrderbookSchema):
+    #                     await self._process_orderbook(data)
+
+    #             except ValidationError as e:
+    #                 logging.error(f"Validation Error in consumer: {e}")
+    #             except Exception as e:
+    #                 logging.error(f"Error processing message in consumer: {e.__class__.__name__} - {e}", exc_info=True)
+    #     finally:
+    #         # 루프가 어떤 이유로든 종료되면 close 호출
+    #         await self.close()
     async def run(self):
-        """Kafka Consumer를 시작하고 메시지를 지속적으로 처리합니다."""
+        """
+        Kafka Consumer를 시작하고 메시지를 지속적으로 처리
+        """
+        logging.info("Starting Kafka consumer...")
         await self._consumer.start()
-        logging.info("Kafka consumer started.")
         
         schema_map = {
             "trade": UpbitTradeSchema,
@@ -91,24 +134,20 @@ class TradeDataConsumer:
         }
 
         try:
-            async for msg in self._consumer:
+            # async for 대신 while 루프와 getone() 사용
+            # 새로운 메시지가 도착할 때까지 기다렸다가 메시지 하나를 가져오는 역할
+            while True:
+                msg = await self._consumer.getone()
                 try:
-                    # 1. Kafka 메시지(bytes)를 딕셔너리로 파싱
                     raw_data = json.loads(msg.value.decode('utf-8'))
-                    
-                    # 2. 'ty' 필드로 타입 확인
-                    msg_type = raw_data.get("ty")
-                    
-                    # 3. 타입에 맞는 스키마 가져오기
+                    msg_type = raw_data.get("type")
                     SchemaModel = schema_map.get(msg_type)
                     
                     if not SchemaModel:
                         continue
                         
-                    # 4. 해당 스키마로 검증
                     data = SchemaModel.model_validate(raw_data)
                     
-                    # 데이터 타입에 따라 적절한 처리 함수 호출
                     if isinstance(data, UpbitTradeSchema):
                         await self._process_trade(data)
                     elif isinstance(data, UpbitTickerSchema):
@@ -119,9 +158,11 @@ class TradeDataConsumer:
                 except ValidationError as e:
                     logging.error(f"Validation Error in consumer: {e}")
                 except Exception as e:
-                    logging.error(f"Error processing message...")
+                    logging.error(f"Error processing message in consumer: {e.__class__.__name__} - {e}", exc_info=True)
         finally:
+            # 루프가 어떤 이유로든 종료되면 close 호출
             await self.close()
+
 
     async def close(self):
         """

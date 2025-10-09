@@ -1,82 +1,76 @@
-# shared/schemas.py
 from datetime import datetime, timezone
 from pydantic import BaseModel, Field, field_validator
-from typing import Literal, List, Union
+from typing import List, Literal, Union
 
-def convert_timestamp_to_datetime(value: int) -> datetime:
-    """ 
-    Upbit에서 제공하는 millisecond 단위의 Unix timestamp를
-    Python의 표준 datetime 객체(UTC)로 변환하는 공통 함수
+# --- Reusable Smart Timestamp Validator ---
+def smart_timestamp_converter(value: Union[int, str]) -> datetime:
     """
-    return datetime.fromtimestamp(value / 1000, tz=timezone.utc)
+    Handles both integer/string millisecond timestamps and ISO 8601 formatted strings.
+    """
+    if isinstance(value, str) and not value.isdigit():
+        # Handle ISO 8601 format like '2025-10-09T08:28:29.337000Z'
+        # Pydantic v2 automatically handles standard ISO 8601 strings if the type hint is datetime.
+        # We'll rely on that parsing and just ensure it's timezone-aware.
+        dt = datetime.fromisoformat(value.replace('Z', '+00:00'))
+        return dt.astimezone(timezone.utc)
+    else:
+        # Handle millisecond timestamps (as int or string)
+        return datetime.fromtimestamp(int(value) / 1000, tz=timezone.utc)
 
-## 호가(Orderbook) 데이터의 중첩된 구조를 위한 하위 스키마 ##
+# --- Sub-schema for nested structure in Orderbook data ---
+
 class UpbitOrderbookUnitSchema(BaseModel):
-    """
-    호가 정보(매수/매도 각 1개 라인)를 나타내는 가장 작은 단위의 스키마
-    """
-    ask_price: float = Field(alias="ap")
-    ask_size: float = Field(alias="as")
-    bid_price: float = Field(alias="bp")
-    bid_size: float = Field(alias="bs")
+    """Represents the smallest unit of an order book (one ask/bid line)."""
+    ask_price: float = Field(alias="ask_price")
+    bid_price: float = Field(alias="bid_price")
+    ask_size: float = Field(alias="ask_size")
+    bid_size: float = Field(alias="bid_size")
 
-## 메인 데이터 타입별 스키마 ##
- 
+# --- Main Schemas for each data type ---
+
 class UpbitTradeSchema(BaseModel):
-    """
-    실시간 체결(Trade) 데이터 스키마
-    """
-    type: Literal["trade"] = Field(alias="ty")
-    symbol: str = Field(alias="cd")
-    price: float = Field(alias="tp")
-    volume: float = Field(alias="tv")
-    side: Literal["ASK", "BID"] = Field(alias="ab")
-    timestamp: datetime = Field(alias="tms")
+    """Schema for real-time trade data."""
+    type: str = Field(alias="type")
+    symbol: str = Field(alias="code")
+    price: float = Field(alias="trade_price")
+    volume: float = Field(alias="trade_volume")
+    side: Literal["ASK", "BID"] = Field(alias="ask_bid")
+    timestamp: datetime = Field(alias="trade_timestamp")
 
-    # Pydantic v2 스타일의 field_validator
-    _validate_timestamp = field_validator("timestamp", mode="before")(convert_timestamp_to_datetime)
+    _validate_timestamp = field_validator("timestamp", mode="before")(smart_timestamp_converter)
     
     class Config:
         populate_by_name = True
 
 class UpbitTickerSchema(BaseModel):
-    """
-    실시간 현재가(Ticker) 데이터 스키마
-    """
-    type: Literal["ticker"] = Field(alias="ty")
-    symbol: str = Field(alias="cd")
-    open_price: float = Field(alias="op")
-    high_price: float = Field(alias="hp")
-    low_price: float = Field(alias="lp")
-    trade_price: float = Field(alias="tp") # 현재가
-    change: Literal["RISE", "EVEN", "FALL"] = Field(alias="c")
-    change_price: float = Field(alias="cp")
-    signed_change_rate: float = Field(alias="scr")
-    acc_trade_volume_24h: float = Field(alias="atv24h")
-    timestamp: datetime = Field(alias="tms")
+    """Schema for real-time ticker data."""
+    type: str = Field(alias="type")
+    symbol: str = Field(alias="code")
+    open_price: float = Field(alias="opening_price")
+    high_price: float = Field(alias="high_price")
+    low_price: float = Field(alias="low_price")
+    trade_price: float = Field(alias="trade_price")
+    change: Literal["RISE", "EVEN", "FALL"] = Field(alias="change")
+    change_price: float = Field(alias="change_price")
+    signed_change_rate: float = Field(alias="signed_change_rate")
+    acc_trade_volume_24h: float = Field(alias="acc_trade_volume_24h")
+    timestamp: datetime = Field(alias="timestamp")
 
-    _validate_timestamp = field_validator("timestamp", mode="before")(convert_timestamp_to_datetime)
+    _validate_timestamp = field_validator("timestamp", mode="before")(smart_timestamp_converter)
 
     class Config:
         populate_by_name = True
-
+        
 class UpbitOrderbookSchema(BaseModel):
-    """
-    실시간 호가(Orderbook) 데이터 스키마
-    """
+    """Schema for real-time order book data."""
+    type: str = Field(alias="type")
+    symbol: str = Field(alias="code")
+    total_ask_size: float = Field(alias="total_ask_size")
+    total_bid_size: float = Field(alias="total_bid_size")
+    orderbook_units: List[UpbitOrderbookUnitSchema] = Field(alias="orderbook_units")
+    timestamp: datetime = Field(alias="timestamp")
 
-    type: Literal["orderbook"] = Field(alias="ty")
-    symbol: str = Field(alias="cd")
-    total_ask_size: float = Field(alias="tas")
-    total_bid_size: float = Field(alias="tbs")
-    orderbook_units: List[UpbitOrderbookUnitSchema] = Field(alias="obu")
-    timestamp: datetime = Field(alias="tms")
-
-    _validate_timestamp = field_validator("timestamp", mode="before")(convert_timestamp_to_datetime)
+    _validate_timestamp = field_validator("timestamp", mode="before")(smart_timestamp_converter)
 
     class Config:
         populate_by_name = True
-
-# --- 모든 웹소켓 데이터 타입을 아우르는 Union 타입 ---
-
-UpbitWebsocketData = Union[UpbitTradeSchema, UpbitTickerSchema, UpbitOrderbookSchema]
