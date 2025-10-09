@@ -10,22 +10,22 @@
 
 # 5. 연결이 끊기면 자동으로 재접속을 시도
 
-
 import asyncio
 import json
 import uuid
 import websockets
+import logging
 from websockets.exceptions import ConnectionClosed
 from aiokafka import AIOKafkaProducer
 from pydantic import ValidationError
-
 from streaming.config import settings
 from shared.schemas import (
-    UpbitWebsocketData, 
     UpbitTradeSchema, 
     UpbitTickerSchema, 
     UpbitOrderbookSchema
 )
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class UpbitWebsocketProducer:
     """
@@ -41,15 +41,33 @@ class UpbitWebsocketProducer:
             UpbitTickerSchema: settings.KAFKA_TICKER_TOPIC,
             UpbitOrderbookSchema: settings.KAFKA_ORDERBOOK_TOPIC,
         }
+        # message type과 Pydantic 스키마를 매핑
+        self._schema_map = {
+            "trade": UpbitTradeSchema,
+            "ticker": UpbitTickerSchema,
+            "orderbook": UpbitOrderbookSchema,
+        }
 
     async def _handle_message(self, message: str):
         """
         수신된 메시지를 파싱, 검증하고 적절한 Kafka 토픽으로 전송
         """
         try:
-            # Union 타입을 사용하여 어떤 데이터 타입이든 한 번에 검증
-            # Union 타입을 통해 어떤 종류(체결, 티커, 호가)의 메시지가 들어와도 Pydantic이 맞는 스키마를 찾아 파싱하고 유효성을 검사
-            data = UpbitWebsocketData.model_validate_json(message)
+            # 1.  JSON 딕셔너리로 파싱
+            raw_data = json.loads(message)
+            
+            # 2. 'ty' 필드로 메시지 타입 확인
+            msg_type = raw_data.get("ty")
+            
+            # 3. 타입에 맞는 스키마를 맵에서 가져오기
+            SchemaModel = self._schema_map.get(msg_type)
+            
+            if not SchemaModel:
+                # 처리하기로 한 타입이 아니면 무시
+                return
+
+            # 4. 해당 스키마로 데이터 검증
+            data = SchemaModel.model_validate(raw_data)
             
             # 데이터 타입에 맞는 토픽을 가져옴
             topic = self._topic_map.get(type(data))
@@ -57,18 +75,17 @@ class UpbitWebsocketProducer:
                 print(f"No topic mapping for data type: {type(data)}")
                 return
             
-            # Pydantic 모델을 JSON 바이트로 직렬화하여 Kafka에 전송
             await self._producer.send_and_wait(
                 topic, 
                 data.model_dump_json().encode('utf-8')
             )
-            print(f"Sent to {topic}: {data.symbol}") # 동작 확인용 로그
             
         except ValidationError as e:
-            # Pydantic 유효성 검사 실패 시
-            print(f"Validation Error: {e}\nRaw Message: {message[:200]}...")
+            #print(f"Validation Error: {e}\nRaw Message: {message[:200]}...")
+            logging.error(f"Validation Error: {e}")
         except Exception as e:
-            print(f"An unexpected error occurred: {e}")
+            # 더 자세한 에러를 볼 수 있도록 수정
+            print(f"An unexpected error occurred in producer: {e.__class__.__name__} - {e}")
 
     async def run(self):
         """
@@ -86,7 +103,8 @@ class UpbitWebsocketProducer:
         while True:
             try:
                 async with websockets.connect(settings.UPBIT_WEBSOCKET_URL) as websocket:
-                    print("WebSocket connected. Sending subscription request...")
+                    #print("WebSocket connected. Sending subscription request...")
+                    logging.info("WebSocket connected, Sending subscription request")
                     await websocket.send(json.dumps(subscribe_message))
                     print("Subscription request sent.")
                     
@@ -101,7 +119,9 @@ class UpbitWebsocketProducer:
                 await asyncio.sleep(5)
                 
     async def close(self):
-        """Kafka Producer를 안전하게 종료합니다."""
+        """
+        Kafka Producer를 종료
+        """
         print("Stopping Kafka producer...")
         await self._producer.stop()
         print("Producer stopped.")

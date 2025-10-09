@@ -22,7 +22,7 @@ async def main():
         """
         종료 신호를 받으면 이벤트 객체를 세팅하여 main loop를 중단시키는 핸들러
         """
-        print("Shutdown signal received. Cleaning up...")
+        print("Shutdown signal received, cleaning up")
         shutdown_event.set()
 
     # 운영체제 신호에 핸들러 연결
@@ -32,19 +32,19 @@ async def main():
     # 3. Producer와 Consumer를 백그라운드 태스크로 실행
     producer_task = asyncio.create_task(producer.run())
     consumer_task = asyncio.create_task(consumer.run())
-    print("Producer and Consumer tasks started.")
+    print("Producer and Consumer tasks started")
 
     # 4. 종료 신호가 들어올 때까지 대기
     await shutdown_event.wait()
     
     # 5. 종료 신호 수신 후, 모든 태스크를 안전하게 취소하고 정리
-    print("Shutting down producer and consumer...")
+    print("Shutting down producer and consumer")
     producer_task.cancel()
     consumer_task.cancel()
 
     # 모든 리소스가 정리될 때까지 기다림
     await asyncio.gather(producer.close(), consumer.close(), return_exceptions=True)
-    print("Application shutdown complete.")
+    print("Application shutdown complete")
 
 if __name__ == "__main__":
     try:
