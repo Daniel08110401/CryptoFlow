@@ -17,7 +17,7 @@ COPY pyproject.toml poetry.lock* ./
 
 # 6. Poetry를 사용해 의존성 설치 (가상환경 생성 없이)
 RUN poetry config virtualenvs.create false && \
-    poetry install --no-root --no-dev
+    poetry install --no-root --only main
 
 # 7. 프로젝트 소스 코드 전체 복사
 COPY ./streaming ./streaming
