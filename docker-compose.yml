@@ -1,6 +1,7 @@
 services:
   postgres:
     image: postgres:16  # 사용할 이미지: PostgreSQL 16 버전
+    container_name: postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -12,7 +13,7 @@ services:
 
 # Airflow Webserver 설정
   airflow-webserver:
-    image: apache/airflow:2.7.0
+    build: ./airflow_setup
     container_name: aifrlow-webserver
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
@@ -31,7 +32,7 @@ services:
 
   # Airflow Scheduler 설정
   airflow-scheduler:
-    image: apache/airflow:2.7.0
+    build: ./airflow_setup
     container_name: airflow-scheduler
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
@@ -48,7 +49,7 @@ services:
   
   # Airflow 초기화 (DB 스키마 업그레이드 및 사용자 생성)
   airflow-init:
-    image: apache/airflow:2.7.0
+    build: ./airflow_setup
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres/${POSTGRES_DB}

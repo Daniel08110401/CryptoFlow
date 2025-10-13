@@ -415,3 +415,17 @@
 [2025-10-10T16:04:18.823+0000] {logging_mixin.py:151} INFO - [2025-10-10T16:04:18.822+0000] {dag.py:2907} INFO - Sync 1 DAGs
 [2025-10-10T16:04:18.834+0000] {logging_mixin.py:151} INFO - [2025-10-10T16:04:18.834+0000] {dag.py:3677} INFO - Setting next_dagrun for bitcoin_price_dag to 2025-10-10T15:00:00+00:00, run_after=2025-10-10T16:00:00+00:00
 [2025-10-10T16:04:18.843+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/bitcoin_price_dag.py took 0.045 seconds
+[2025-10-10T16:04:49.063+0000] {processor.py:157} INFO - Started process (PID=610) to work on /opt/airflow/dags/bitcoin_price_dag.py
+[2025-10-10T16:04:49.064+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/bitcoin_price_dag.py for tasks to queue
+[2025-10-10T16:04:49.065+0000] {logging_mixin.py:151} INFO - [2025-10-10T16:04:49.065+0000] {dagbag.py:539} INFO - Filling up the DagBag from /opt/airflow/dags/bitcoin_price_dag.py
+[2025-10-10T16:04:49.075+0000] {processor.py:839} INFO - DAG(s) dict_keys(['bitcoin_price_dag']) retrieved from /opt/airflow/dags/bitcoin_price_dag.py
+[2025-10-10T16:04:49.092+0000] {logging_mixin.py:151} INFO - [2025-10-10T16:04:49.092+0000] {dag.py:2907} INFO - Sync 1 DAGs
+[2025-10-10T16:04:49.104+0000] {logging_mixin.py:151} INFO - [2025-10-10T16:04:49.104+0000] {dag.py:3677} INFO - Setting next_dagrun for bitcoin_price_dag to 2025-10-10T15:00:00+00:00, run_after=2025-10-10T16:00:00+00:00
+[2025-10-10T16:04:49.111+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/bitcoin_price_dag.py took 0.051 seconds
+[2025-10-10T16:05:19.322+0000] {processor.py:157} INFO - Started process (PID=615) to work on /opt/airflow/dags/bitcoin_price_dag.py
+[2025-10-10T16:05:19.323+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/bitcoin_price_dag.py for tasks to queue
+[2025-10-10T16:05:19.324+0000] {logging_mixin.py:151} INFO - [2025-10-10T16:05:19.323+0000] {dagbag.py:539} INFO - Filling up the DagBag from /opt/airflow/dags/bitcoin_price_dag.py
+[2025-10-10T16:05:19.333+0000] {processor.py:839} INFO - DAG(s) dict_keys(['bitcoin_price_dag']) retrieved from /opt/airflow/dags/bitcoin_price_dag.py
+[2025-10-10T16:05:19.349+0000] {logging_mixin.py:151} INFO - [2025-10-10T16:05:19.349+0000] {dag.py:2907} INFO - Sync 1 DAGs
+[2025-10-10T16:05:19.361+0000] {logging_mixin.py:151} INFO - [2025-10-10T16:05:19.361+0000] {dag.py:3677} INFO - Setting next_dagrun for bitcoin_price_dag to 2025-10-10T15:00:00+00:00, run_after=2025-10-10T16:00:00+00:00
+[2025-10-10T16:05:19.369+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/bitcoin_price_dag.py took 0.050 seconds
