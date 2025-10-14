@@ -51,7 +51,7 @@ def load_raw_data_to_postgres(api_response: dict):
     target_table = "upbit_api_raw_data_landing"
     target_fields = ["payload", "endpoint"]
     
-    # 각 JSON 객체를 json.dumps를 사용하여 문자열로 변환한 후 튜플로 만듭니다.
+    # 각 JSON 객체를 json.dumps를 사용하여 문자열로 변환한 후 튜플로 변환
     rows_to_insert = [
         (json.dumps(item), endpoint) for item in data_list
     ]
@@ -70,8 +70,8 @@ with DAG(
     tags=["upbit", "api", "ELT"],
     doc_md="""
     ### Upbit 24시간 Ticker 데이터 수집 및 데이터 레이크 적재 DAG
-    - **Extract**: Upbit REST API에서 KRW 마켓의 24시간 Ticker 데이터를 추출합니다.
-    - **Load**: 추출된 원본 데이터를 `upbit_api_raw_data_landing` 테이블의 JSONB 컬럼에 적재합니다.
+    - Extract: Upbit REST API에서 KRW 마켓의 24시간 Ticker 데이터를 추출
+    - Load: 추출된 원본 데이터를 `upbit_api_raw_data_landing` 테이블의 JSONB 컬럼에 적재
     """,
 ) as dag:
     # Task 의존성 설정
