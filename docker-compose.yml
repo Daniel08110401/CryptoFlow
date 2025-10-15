@@ -10,6 +10,8 @@ services:
       - "5432:5432"  # 컨테이너의 포트 5432를 호스트와 연결
     volumes:
       - postgres-data:/var/lib/postgresql/data
+    networks:
+    - cryptoflow-network
 
 # Airflow Webserver 설정
   airflow-webserver:
@@ -29,6 +31,8 @@ services:
     depends_on:
       - postgres
     command: webserver
+    networks:
+    - cryptoflow-network
 
   # Airflow Scheduler 설정
   airflow-scheduler:
@@ -46,6 +50,8 @@ services:
     depends_on:
       - postgres
     command: scheduler
+    networks:
+    - cryptoflow-network
   
   # Airflow 초기화 (DB 스키마 업그레이드 및 사용자 생성)
   airflow-init:
@@ -68,6 +74,8 @@ services:
           --password admin || true
     depends_on:
       - postgres
+    networks:
+    - cryptoflow-network
   
   # --- 실시간 데이터 파이프라인 (Hot Path) ---
   zookeeper:
@@ -96,6 +104,11 @@ services:
       KAFKA_CREATE_TOPICS: "upbit-trades:1:1,upbit-tickers:1:1,upbit-orderbooks:1:1"
     networks:
       - cryptoflow-network
+    healthcheck: # Kafka 서비스가 실제로 연결을 받을 준비가 완료될 때까지 기다려야 함
+      test: ["CMD", "kafka-topics", "--bootstrap-server", "localhost:29092", "--list"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
 
   redis:
     image: redis:7-alpine
@@ -108,15 +121,47 @@ services:
   stream-app:
     build: .
     container_name: stream-app
+    restart: on-failure
     depends_on:
-      - kafka
-      - redis
+      kafka: # kafka와 redis를 객체 형태로 변경
+        condition: service_healthy
+      redis:
+        condition: service_started # redis는 healthcheck가 없으므로 started
     environment:
       KAFKA_BOOTSTRAP_SERVERS: 'kafka:29092'
       REDIS_HOST: 'redis'
     volumes:
       - ./streaming:/app/streaming
       - ./shared:/app/shared
+    networks:
+      - cryptoflow-network
+    
+
+# --- Django API 서버 (Serving Layer) ---
+  django-app:
+    build:
+      context: .
+      dockerfile: Dockerfile.django  # Django용 Dockerfile 지정
+    container_name: django-app
+    restart: on-failure
+    depends_on:
+      kafka: # kafka와 redis를 객체 형태로 변경
+        condition: service_healthy
+      redis:
+        condition: service_started # redis는 healthcheck가 없으므로 started
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./crypto_flow_django:/app/crypto_flow_django
+    ports:
+      - "8000:8000"
+    environment:
+      # Django가 Redis, Postgres에 접속하기 위한 환경 변수
+      REDIS_HOST: 'redis'
+      POSTGRES_HOST: 'postgres'
+      # .env 파일의 변수들을 그대로 전달
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     networks:
       - cryptoflow-network
 
