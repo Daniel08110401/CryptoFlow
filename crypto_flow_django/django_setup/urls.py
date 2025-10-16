@@ -1,10 +1,16 @@
 from django.contrib import admin
 from django.urls import path
-from bitcoin import views  # 1. bitcoin 앱의 views.py 파일을 가져옴
+from bitcoin import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    # 2. 새로운 경로 추가
-    path('realtime-price/', views.RealtimePriceView.as_view(), name='realtime-price'),
+    ## Real-time data api ##
+    path('api/realtime-price/', views.RealtimePriceView.as_view(), name='realtime-price'),
+
+    ## Batch data api ##
+    path('api/market-stats/', views.MarketStatsView.as_view(), name='market-stats-list'),
+
+    # Batch data for specific crypto market
+    path('api/market-stats/<str:market_symbol>/', views.MarketStatsDetailView.as_view(), name='market-stats-detail'),
 ]

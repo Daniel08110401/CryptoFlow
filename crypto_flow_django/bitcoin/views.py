@@ -1,9 +1,12 @@
-# crypto_flow_django/bitcoin/views.py
 
 from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.response import Response
 from .services_cache import get_realtime_ticker_from_redis
+from .models import MarketStats24h
+from .serializers import MarketStats24hSerializer
 
+# Streaming data views
 class RealtimePriceView(APIView):
     def get(self, request, market="KRW-BTC"):
         # 새로운 서비스 함수를 호출
@@ -19,3 +22,24 @@ class RealtimePriceView(APIView):
         else:
             # 데이터가 없을 경우 에러 메시지를 반환
             return Response({"error": f"No realtime data for {market}"}, status=404)
+
+
+# Batch data views
+class MarketStatsView(ListAPIView):
+    """
+    market_stats_24h 테이블의 모든 데이터를 조회하는 API view
+    """
+    # 이 뷰가 사용할 데이터셋(모든 MarketStats24h 객체)을 지정
+    queryset = MarketStats24h.objects.all().order_by('symbol')
+    # 이 뷰가 데이터를 JSON으로 변환할 때 사용할 Serializer를 지정
+    serializer_class = MarketStats24hSerializer
+
+# Speciic market data views
+class MarketStatsSpecificMarketView(RetrieveAPIView):
+    """
+    특정 마켓(market_symbol) 하나의 24시간 통계 데이터를 조회하는 API view
+    """
+    queryset = MarketStats24h.objects.all()
+    serializer_class = MarketStats24hSerializer
+    lookup_field = 'market_symbol' # URL에서 받을 파라미터 이름을 market_symbol로 지정
+
