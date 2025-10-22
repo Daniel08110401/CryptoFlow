@@ -1,2 +1,10 @@
 requests
 apache-airflow-providers-postgres
+
+# ML 관련 라이브러리
+pandas           
+scikit-learn     
+xgboost          
+jupyter          
+matplotlib       
+seaborn          

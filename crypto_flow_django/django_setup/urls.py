@@ -12,5 +12,5 @@ urlpatterns = [
     path('api/market-stats/', views.MarketStatsView.as_view(), name='market-stats-list'),
 
     # Batch data for specific crypto market
-    path('api/market-stats/<str:market_symbol>/', views.MarketStatsDetailView.as_view(), name='market-stats-detail'),
+    path('api/market-stats/<str:market_symbol>/', views.MarketStatsSpecificMarketView.as_view(), name='market-stats-detail'),
 ]

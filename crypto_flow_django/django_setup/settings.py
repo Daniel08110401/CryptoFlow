@@ -12,7 +12,6 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -56,7 +55,6 @@ WSGI_APPLICATION = 'django_setup.wsgi.application'
 
 
 # Database
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -85,6 +83,18 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+
+# CELERY
+# Redis를 메시지 브로커로 사용
+# Docker 환경에서는 서비스 이름 'redis'를 사용
+CELERY_BROKER_URL = f"redis://{os.environ.get('REDIS_HOST', 'localhost')}:6379/1"
+# 작업 결과를 Redis에 저장 (상태 추적에 유용)
+CELERY_RESULT_BACKEND = CELERY_BROKER_URL
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Seoul' # 작업 시간 기준을 서울 시간으로 설정
 
 
 # Internationalization
