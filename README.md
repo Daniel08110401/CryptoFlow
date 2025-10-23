@@ -16,7 +16,7 @@
 
 ### ⚡️ 실시간 경로 (Hot Path)
 
-  * **목적**: 현재 시장 상황을 \*\*가장 낮은 지연 시간(Low Latency)\*\*으로 처리하여 실시간 API 및 대시보드에 제공합니다.
+  * **목적**: 현재 시장 상황을 가장 낮은 지연 시간(Low Latency)으로 처리하여 실시간 API 및 대시보드에 제공합니다.
   * **데이터 흐름**: `Upbit WebSocket` → `Python Producer (Asyncio)` → `Kafka` → `Python Consumer (Asyncio)` → `Redis`
   * **핵심 기능**:
       * `aiokafka` 기반 비동기 Producer/Consumer로 초당 수십 건의 체결/호가/시세 데이터 안정적 처리.
