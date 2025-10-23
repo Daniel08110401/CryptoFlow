@@ -41903,3 +41903,456 @@ File Path                                                      PID  Runtime     
 /opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py    485  0.01s             1           0  0.07s           2025-10-22T04:45:42
 ================================================================================
 [2025-10-22T04:46:30.275+0000] {manager.py:470} INFO - Exiting gracefully upon receiving signal 15
+[2025-10-22T06:16:13.640+0000] {manager.py:488} INFO - Processing files using up to 2 processes at a time 
+[2025-10-22T06:16:13.641+0000] {manager.py:489} INFO - Process each file at most once every 30 seconds
+[2025-10-22T06:16:13.641+0000] {manager.py:490} INFO - Checking for new files in /opt/airflow/dags every 300 seconds
+[2025-10-22T06:16:13.641+0000] {manager.py:760} INFO - Searching for files in /opt/airflow/dags
+[2025-10-22T06:16:13.660+0000] {manager.py:763} INFO - There are 2 files in /opt/airflow/dags
+[2025-10-22T06:16:13.739+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                      PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  ----------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py               174  0.02s             0           0
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py    171  0.02s             0           0
+================================================================================
+[2025-10-22T06:16:43.900+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                    PID    Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py                                      1           0  0.19s           2025-10-22T06:16:13
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py                           1           0  0.19s           2025-10-22T06:16:13
+================================================================================
+[2025-10-22T06:17:14.335+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                      PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py               200  0.00s             1           0  0.06s           2025-10-22T06:16:44
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py    197  0.01s             1           0  0.06s           2025-10-22T06:16:44
+================================================================================
+[2025-10-22T06:17:44.643+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                      PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py               210  0.00s             1           0  0.06s           2025-10-22T06:17:14
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py    207  0.01s             1           0  0.06s           2025-10-22T06:17:14
+================================================================================
+[2025-10-22T06:18:14.938+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                      PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py               220  0.00s             1           0  0.06s           2025-10-22T06:17:44
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py    217  0.00s             1           0  0.06s           2025-10-22T06:17:44
+================================================================================
+[2025-10-22T06:18:42.964+0000] {manager.py:470} INFO - Exiting gracefully upon receiving signal 15
+[2025-10-22T06:46:23.838+0000] {manager.py:488} INFO - Processing files using up to 2 processes at a time 
+[2025-10-22T06:46:23.841+0000] {manager.py:489} INFO - Process each file at most once every 30 seconds
+[2025-10-22T06:46:23.843+0000] {manager.py:490} INFO - Checking for new files in /opt/airflow/dags every 300 seconds
+[2025-10-22T06:46:23.843+0000] {manager.py:760} INFO - Searching for files in /opt/airflow/dags
+[2025-10-22T06:46:23.915+0000] {manager.py:763} INFO - There are 2 files in /opt/airflow/dags
+[2025-10-22T06:46:42.261+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                    PID    Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py                                      1           0  0.18s           2025-10-22T06:46:24
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py                           1           0  0.18s           2025-10-22T06:46:24
+================================================================================
+[2025-10-22T06:47:12.562+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                    PID    Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py                                      1           0  0.07s           2025-10-22T06:46:54
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py                           1           0  0.07s           2025-10-22T06:46:54
+================================================================================
+[2025-10-22T06:47:42.851+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                    PID    Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py                                      1           0  0.07s           2025-10-22T06:47:24
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py                           1           0  0.07s           2025-10-22T06:47:24
+================================================================================
+[2025-10-22T06:48:13.159+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                    PID    Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py                                      1           0  0.07s           2025-10-22T06:47:55
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py                           1           0  0.07s           2025-10-22T06:47:55
+================================================================================
+[2025-10-22T06:48:43.449+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                    PID    Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py                                      1           0  0.06s           2025-10-22T06:48:25
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py                           1           0  0.07s           2025-10-22T06:48:25
+================================================================================
+[2025-10-22T06:49:13.751+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                    PID    Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py                                      1           0  0.06s           2025-10-22T06:48:55
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py                           1           0  0.07s           2025-10-22T06:48:55
+================================================================================
+[2025-10-22T06:49:44.079+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                    PID    Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py                                      1           0  0.06s           2025-10-22T06:49:25
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py                           1           0  0.07s           2025-10-22T06:49:25
+================================================================================
+[2025-10-22T06:50:14.367+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                    PID    Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py                                      1           0  0.06s           2025-10-22T06:49:56
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py                           1           0  0.07s           2025-10-22T06:49:56
+================================================================================
+[2025-10-22T06:50:44.633+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                    PID    Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py                                      1           0  0.06s           2025-10-22T06:50:26
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py                           1           0  0.07s           2025-10-22T06:50:26
+================================================================================
+[2025-10-22T06:51:14.916+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                    PID    Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py                                      1           0  0.06s           2025-10-22T06:50:56
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py                           1           0  0.07s           2025-10-22T06:50:56
+================================================================================
+[2025-10-22T06:51:23.973+0000] {manager.py:760} INFO - Searching for files in /opt/airflow/dags
+[2025-10-22T06:51:23.985+0000] {manager.py:763} INFO - There are 2 files in /opt/airflow/dags
+[2025-10-22T06:51:45.203+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                    PID    Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py                                      1           0  0.07s           2025-10-22T06:51:27
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py                           1           0  0.06s           2025-10-22T06:51:27
+================================================================================
+[2025-10-22T06:52:15.516+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                    PID    Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py                                      1           0  0.06s           2025-10-22T06:51:57
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py                           1           0  0.07s           2025-10-22T06:51:57
+================================================================================
+[2025-10-22T06:52:45.827+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                    PID    Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py                                      1           0  0.06s           2025-10-22T06:52:27
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py                           1           0  0.07s           2025-10-22T06:52:27
+================================================================================
+[2025-10-22T06:53:16.145+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                    PID    Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py                                      1           0  0.06s           2025-10-22T06:52:57
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py                           1           0  0.07s           2025-10-22T06:52:57
+================================================================================
+[2025-10-22T06:53:46.435+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                    PID    Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py                                      1           0  0.06s           2025-10-22T06:53:28
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py                           1           0  0.06s           2025-10-22T06:53:28
+================================================================================
+[2025-10-22T06:55:10.509+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                    PID    Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py                                      1           0  0.06s           2025-10-22T06:55:05
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py                           1           0  0.07s           2025-10-22T06:55:05
+================================================================================
+[2025-10-22T06:55:40.813+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                    PID    Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py                                      1           0  0.06s           2025-10-22T06:55:35
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py                           1           0  0.07s           2025-10-22T06:55:35
+================================================================================
+[2025-10-22T06:56:11.100+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                    PID    Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py                                      1           0  0.06s           2025-10-22T06:56:06
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py                           1           0  0.06s           2025-10-22T06:56:06
+================================================================================
+[2025-10-22T06:56:24.209+0000] {manager.py:760} INFO - Searching for files in /opt/airflow/dags
+[2025-10-22T06:56:24.223+0000] {manager.py:763} INFO - There are 2 files in /opt/airflow/dags
+[2025-10-22T06:56:41.414+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                    PID    Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py                                      1           0  0.06s           2025-10-22T06:56:36
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py                           1           0  0.06s           2025-10-22T06:56:36
+================================================================================
+[2025-10-22T06:57:11.689+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                    PID    Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py                                      1           0  0.06s           2025-10-22T06:57:06
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py                           1           0  0.06s           2025-10-22T06:57:06
+================================================================================
+[2025-10-22T06:57:41.931+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                    PID    Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py                                      1           0  0.06s           2025-10-22T06:57:36
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py                           1           0  0.06s           2025-10-22T06:57:36
+================================================================================
+[2025-10-22T06:58:12.214+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                    PID    Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py                                      1           0  0.06s           2025-10-22T06:58:07
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py                           1           0  0.06s           2025-10-22T06:58:07
+================================================================================
+[2025-10-22T06:58:42.547+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                    PID    Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py                                      1           0  0.06s           2025-10-22T06:58:37
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py                           1           0  0.07s           2025-10-22T06:58:37
+================================================================================
+[2025-10-22T06:59:12.804+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                    PID    Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py                                      1           0  0.06s           2025-10-22T06:59:07
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py                           1           0  0.07s           2025-10-22T06:59:07
+================================================================================
+[2025-10-22T06:59:43.081+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                    PID    Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py                                      1           0  0.06s           2025-10-22T06:59:38
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py                           1           0  0.06s           2025-10-22T06:59:38
+================================================================================
+[2025-10-22T07:00:13.320+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                    PID    Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py                                      1           0  0.05s           2025-10-22T07:00:08
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py                           1           0  0.06s           2025-10-22T07:00:08
+================================================================================
+[2025-10-22T07:00:43.571+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                    PID    Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py                                      1           0  0.06s           2025-10-22T07:00:38
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py                           1           0  0.07s           2025-10-22T07:00:38
+================================================================================
+[2025-10-22T07:01:13.814+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                    PID    Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py                                      1           0  0.06s           2025-10-22T07:01:08
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py                           1           0  0.07s           2025-10-22T07:01:08
+================================================================================
+[2025-10-22T07:01:24.902+0000] {manager.py:760} INFO - Searching for files in /opt/airflow/dags
+[2025-10-22T07:01:24.917+0000] {manager.py:763} INFO - There are 2 files in /opt/airflow/dags
+[2025-10-22T07:01:44.129+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                    PID    Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py                                      1           0  0.06s           2025-10-22T07:01:39
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py                           1           0  0.06s           2025-10-22T07:01:39
+================================================================================
+[2025-10-22T07:02:08.942+0000] {manager.py:470} INFO - Exiting gracefully upon receiving signal 15
+[2025-10-23T07:00:19.551+0000] {manager.py:488} INFO - Processing files using up to 2 processes at a time 
+[2025-10-23T07:00:19.551+0000] {manager.py:489} INFO - Process each file at most once every 30 seconds
+[2025-10-23T07:00:19.551+0000] {manager.py:490} INFO - Checking for new files in /opt/airflow/dags every 300 seconds
+[2025-10-23T07:00:19.551+0000] {manager.py:760} INFO - Searching for files in /opt/airflow/dags
+[2025-10-23T07:00:19.558+0000] {manager.py:763} INFO - There are 2 files in /opt/airflow/dags
+[2025-10-23T07:00:19.653+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                      PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  ----------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py               174  0.03s             0           0
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py    171  0.04s             0           0
+================================================================================
+[2025-10-23T07:00:49.812+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                    PID    Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py                                      1           0  0.23s           2025-10-23T07:00:19
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py                           1           0  0.23s           2025-10-23T07:00:19
+================================================================================
+[2025-10-23T07:01:20.301+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                      PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py               200  0.00s             1           0  0.07s           2025-10-23T07:00:50
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py    197  0.01s             1           0  0.07s           2025-10-23T07:00:50
+================================================================================
+[2025-10-23T07:01:50.609+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                      PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py               210  0.00s             1           0  0.05s           2025-10-23T07:01:20
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py    207  0.01s             1           0  0.06s           2025-10-23T07:01:20
+================================================================================
+[2025-10-23T07:02:20.864+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                      PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py               220  0.00s             1           0  0.06s           2025-10-23T07:01:50
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py    217  0.01s             1           0  0.06s           2025-10-23T07:01:50
+================================================================================
+[2025-10-23T07:02:27.584+0000] {manager.py:470} INFO - Exiting gracefully upon receiving signal 15
+[2025-10-23T07:26:25.826+0000] {manager.py:488} INFO - Processing files using up to 2 processes at a time 
+[2025-10-23T07:26:25.833+0000] {manager.py:489} INFO - Process each file at most once every 30 seconds
+[2025-10-23T07:26:25.834+0000] {manager.py:490} INFO - Checking for new files in /opt/airflow/dags every 300 seconds
+[2025-10-23T07:26:25.836+0000] {manager.py:760} INFO - Searching for files in /opt/airflow/dags
+[2025-10-23T07:26:25.862+0000] {manager.py:763} INFO - There are 2 files in /opt/airflow/dags
+[2025-10-23T07:26:25.940+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                      PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  ----------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py               174  0.02s             0           0
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py    171  0.03s             0           0
+================================================================================
+[2025-10-23T07:26:56.141+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                      PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py               190  0.00s             1           0  0.19s           2025-10-23T07:26:26
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py    187  0.01s             1           0  0.19s           2025-10-23T07:26:26
+================================================================================
+[2025-10-23T07:27:26.360+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                      PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py               200  0.00s             1           0  0.08s           2025-10-23T07:26:56
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py    197  0.01s             1           0  0.09s           2025-10-23T07:26:56
+================================================================================
+[2025-10-23T07:27:56.654+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                      PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py               210  0.00s             1           0  0.07s           2025-10-23T07:27:26
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py    207  0.01s             1           0  0.07s           2025-10-23T07:27:26
+================================================================================
+[2025-10-23T07:28:26.929+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                      PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py               220  0.00s             1           0  0.05s           2025-10-23T07:27:56
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py    217  0.00s             1           0  0.05s           2025-10-23T07:27:56
+================================================================================
+[2025-10-23T07:28:57.236+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                      PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py               230  0.00s             1           0  0.05s           2025-10-23T07:28:26
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py    227  0.01s             1           0  0.05s           2025-10-23T07:28:26
+================================================================================
+[2025-10-23T07:29:27.528+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                      PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py               240  0.00s             1           0  0.06s           2025-10-23T07:28:57
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py    237  0.01s             1           0  0.07s           2025-10-23T07:28:57
+================================================================================
+[2025-10-23T07:29:57.852+0000] {manager.py:888} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                                      PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/dag_01_build_upbit_datalake.py               250  0.00s             1           0  0.06s           2025-10-23T07:29:27
+/opt/airflow/dags/dag_02_build_market_stats_24h_datamart.py    247  0.01s             1           0  0.06s           2025-10-23T07:29:27
+================================================================================
+[2025-10-23T07:30:03.345+0000] {manager.py:470} INFO - Exiting gracefully upon receiving signal 15

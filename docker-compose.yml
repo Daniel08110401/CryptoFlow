@@ -11,7 +11,7 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
     networks:
-    - cryptoflow-network
+      - cryptoflow-network
 
 # Airflow Webserver 설정
   airflow-webserver:
@@ -33,7 +33,7 @@ services:
       - postgres
     command: webserver
     networks:
-    - cryptoflow-network
+      - cryptoflow-network
 
   # Airflow Scheduler 설정
   airflow-scheduler:
@@ -145,8 +145,10 @@ services:
     container_name: django-app
     restart: on-failure
     depends_on:
-      kafka: # kafka와 redis를 객체 형태로 변경
-        condition: service_healthy
+      # kafka: # kafka와 redis를 객체 형태로 변경
+      #   condition: service_healthy
+      postgres:
+        condition: service_started
       redis:
         condition: service_started # redis는 healthcheck가 없으므로 started
     command: python manage.py runserver 0.0.0.0:8000

@@ -19,6 +19,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_celery_beat',
+    'django_filters',
     'rest_framework',
     'bitcoin',
 ]
@@ -96,6 +98,28 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Asia/Seoul' # 작업 시간 기준을 서울 시간으로 설정
 
+# CELERY BEAT SETTINGS (주기적 작업 스케줄)
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+CELERY_BEAT_SCHEDULE = {
+    'check-ma-cross-every-10-minutes': {
+        'task': 'bitcoin.tasks.check_moving_average_cross', # 실행할 Task 경로
+        'schedule': 600.0,  # 실행 간격 (초 단위, 600초 = 10분)
+        'args': ('KRW-BTC', 5, 20), # Task에 전달할 인자 (symbol, short, long)
+        # 'kwargs': {'symbol': 'KRW-BTC'} # 또는 키워드 argument 전달
+    },
+    # 다른 주기적 Task가 있다면 여기에 추가
+}
+
+REST_FRAMEWORK = {
+    # 기본 페이지네이션 클래스 설정
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    # 페이지당 보여줄 기본 항목 개수 설정
+    'PAGE_SIZE': 100,
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend'
+    ],
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/

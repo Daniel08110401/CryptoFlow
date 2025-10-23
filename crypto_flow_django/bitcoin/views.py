@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from .services_cache import get_realtime_ticker_from_redis
 from .models import MarketStats24h
 from .serializers import MarketStats24hSerializer
+from .filters import MarketStatsFilter
 
 # Streaming data views
 class RealtimePriceView(APIView):
@@ -33,6 +34,7 @@ class MarketStatsView(ListAPIView):
     queryset = MarketStats24h.objects.all().order_by('symbol')
     # 이 뷰가 데이터를 JSON으로 변환할 때 사용할 Serializer를 지정
     serializer_class = MarketStats24hSerializer
+    filterset_class = MarketStatsFilter
 
 # Speciic market data views
 class MarketStatsSpecificMarketView(RetrieveAPIView):
