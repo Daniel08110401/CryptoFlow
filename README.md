@@ -1,183 +1,102 @@
 # CryptoFlow: Real-Time Cryptocurrency Data Pipeline & Analytics
 
-## 1. 프로젝트 개요
+## 1\. 프로젝트 개요
 
-본 프로젝트는 가상화폐(비트코인)를 대상으로 **실시간 + 배치 데이터 파이프라인**을 구축하여 가격 데이터를 자동으로 수집, 처리, 저장, 제공하는 시스템입니다.
+본 프로젝트는 Upbit 암호화폐 거래소 데이터를 대상으로 \*\*실시간(Hot Path)\*\*과 **배치(Cold Path)** 데이터 파이프라인을 분리하여 설계, 구축한 엔드투엔드(End-to-End) 데이터 플랫폼입니다.
 
-Airflow를 활용한 배치 수집, Kafka/Redis 기반의 실시간 스트리밍, PostgreSQL 저장, Django REST Framework API 및 대시보드 시각화까지 포함된 **엔드투엔드 데이터 엔지니어링 파이프라인**입니다.
+실시간 데이터는 `WebSocket`과 `Kafka`를 통해 `Redis`에 적재되며, 배치 데이터는 `Airflow`를 통해 `PostgreSQL` 데이터 레이크(ELT)에 저장됩니다. `Docker Compose`를 통해 전체 인프라를 컨테이너화했으며, `Django`는 수집된 데이터를 활용하여 API 제공 및 비동기 알림(Celery)을 처리하는 서비스 계층을 담당합니다.
 
-이 프로젝트는 데이터 엔지니어링의 핵심 요소인 **데이터 수집, 처리, 저장, 제공** 전 과정을 자동화하고, 금융 데이터의 실시간 활용 시나리오를 학습하는 것을 목표로 합니다.
+이 프로젝트는 대용량 데이터 처리 아키텍처, 데이터 계약의 중요성, 서비스 간 역할 분리(Decoupling) 등 현대 데이터 엔지니어링의 핵심 요소를 학습하고 구현하는 것을 목표로 합니다.
 
----
+-----
 
-## 2. 주요 기능 및 수집 데이터
+## 2\. 주요 기능 및 아키텍처
 
-* **자동화된 데이터 수집**: Airflow DAG를 통해 1시간 단위로 배치 API 호출 (24h 캔들/시세 데이터)
-* **실시간 데이터 스트리밍**: Kafka Producer가 업비트 WebSocket 체결 데이터를 Redis에 적재
-* **정규화된 데이터 저장**: Raw JSON → Bronze 레이어 적재 → Silver 변환 → Gold 분석/예측 데이터 생성
-* **REST API 제공**: Django REST Framework로 최신 가격, 트렌드, 예측 결과를 API로 제공
-* **대시보드 시각화**: Plotly/Dash 기반 시각화 대시보드 제공
+본 프로젝트의 핵심은 **듀얼 파이프라인 아키텍처**입니다.
 
-#### 수집 항목 (예시: Upbit `KRW-BTC`)
+### ⚡️ 실시간 경로 (Hot Path)
 
-* `market`: 마켓 코드 (예: KRW-BTC)
-* `trade_timestamp`: 거래 발생 시각
-* `opening_price`: 시가
-* `high_price`: 고가
-* `low_price`: 저가
-* `trade_price`: 종가(체결가)
-* `acc_trade_volume_24h`: 24시간 누적 거래량
-* `acc_trade_price_24h`: 24시간 누적 거래대금
-* `change_rate`: 전일 대비 변동률
-* `timestamp`: 수집 시각
+  * **목적**: 현재 시장 상황을 \*\*가장 낮은 지연 시간(Low Latency)\*\*으로 처리하여 실시간 API 및 대시보드에 제공합니다.
+  * **데이터 흐름**: `Upbit WebSocket` → `Python Producer (Asyncio)` → `Kafka` → `Python Consumer (Asyncio)` → `Redis`
+  * **핵심 기능**:
+      * `aiokafka` 기반 비동기 Producer/Consumer로 초당 수십 건의 체결/호가/시세 데이터 안정적 처리.
+      * `Redis Streams` (체결 이력) 및 `Hashes` (최신 시세)를 사용한 목적별 데이터 저장.
+      * `Django API`가 Redis 데이터를 직접 조회하여 수십 ms 이내의 빠른 응답 제공.
 
----
+### 📚 배치 경로 (Cold Path)
 
-## 3. 기술 스택 및 아키텍처
+  * **목적**: 과거 데이터를 **누락 없이 영구적으로 저장**하고, 분석 및 ML 모델 학습을 위한 정제된 데이터 마트를 구축합니다.
+  * **데이터 흐름**: `Upbit REST API` → `Airflow DAG (EL)` → `PostgreSQL (Data Lake)` → `Airflow DAG (T)` → `PostgreSQL (Data Mart)`
+  * **핵심 기능**:
+      * **ELT(Extract-Load-Transform) 패턴** 적용: Airflow가 10분마다 200개+ 마켓 데이터를 수집하여 원본 그대로 \*\*데이터 레이크(`JSONB`)\*\*에 먼저 적재(Load)합니다.
+      * **데이터 마트 구축**: 별도의 Airflow DAG가 SQL을 실행하여 데이터 레이크의 원본 데이터를 **DB 내부에서** 가공(Transform), 분석에 최적화된 `market_stats_24h` 테이블을 생성합니다.
 
-* **언어**: Python 3.10
-* **의존성 관리**: Poetry
-* **컨테이너화**: Docker, Docker Compose
-* **워크플로우 관리 (Orchestration)**: Apache Airflow 2.7.3
-* **데이터베이스**: PostgreSQL 16 (Docker 기반)
-* **웹 프레임워크**: Django 4.2, Django REST Framework
-* **실시간 처리**: Kafka 3.5, Redis 7
-* **시각화/대시보드**: Plotly/Dash
-* **머신러닝**: Scikit-learn, XGBoost
+### 🛎️ 서비스 및 자동화 (Application Layer)
 
-### 아키텍처 개요
+  * **Django REST API**: `Redis`(실시간)와 `PostgreSQL`(배치)의 데이터를 조합하여 `/api/realtime-price/`, `/api/market-stats/` 등 RESTful API 제공. (DRF 고급 기능: Pagination, Filtering 적용)
+  * **비동기 알림 시스템**: **Celery** 및 **Celery Beat**를 도입하여, Airflow가 생성한 데이터 마트를 주기적으로 분석하고(예: 이동 평균선 교차 확인), 특정 조건 충족 시 알림(로그, 향후 이메일/Slack)을 보내는 백그라운드 작업 자동화.
 
-* **Docker Compose**가 PostgreSQL, Airflow, Kafka, Redis, Django 서비스를 실행
-* **Airflow DAG**이 Upbit API 호출 → PostgreSQL Bronze 레이어 저장
-* **Kafka Producer**가 실시간 체결 데이터 스트리밍 → Redis 적재
-* **Django API**가 PostgreSQL/Redis 데이터를 읽어 REST API 응답 제공
-* **Plotly/Dash**가 실시간 대시보드를 제공
+-----
 
----
+## 3\. 기술 스택
 
-## 4. 프로젝트 구조
+  * **Language**: Python 3.11+
+  * **Dependency Management**: Poetry
+  * **Infra & DevOps**: Docker, Docker Compose
+  * **Orchestration (Batch)**: Apache Airflow
+  * **Database**: PostgreSQL 16 (Data Lake & Mart), Redis 7 (Real-time Cache & Broker)
+  * **Streaming**: Apache Kafka 3.5
+  * **Backend & API**: Django, Django REST Framework
+  * **Async & Task Queue**: Celery, asyncio
+  * **Data Handling**: Pandas, Pydantic (데이터 계약 및 유효성 검증)
+  * **(예정) ML**: Scikit-learn, XGBoost
 
-```
-CryptoFlow/
-├── crypto_flow_django/
-│   ├── manage.py                     # Django 관리 명령어 파일
-│   ├── bitcoin/                      # 비트코인 데이터 앱
-│   └── ...
-├── airflow_home/
-│   ├── dags/
-│   │   └── bitcoin_price_dag.py      # Airflow DAG 정의
-│   ├── logs/
-│   └── plugins/
-├── scripts/
-│   └── producer.py                   # Kafka Producer (실시간 데이터 수집)
-├── docker-compose.yml                 # 전체 서비스 정의 (Airflow, Postgres, Kafka, Redis, Django)
-├── dockerfile.airflow                 # Airflow 커스텀 Dockerfile
-├── pyproject.toml                     # Poetry 의존성 정의
-├── poetry.lock                        # 의존성 버전 고정
-└── README.md                          # 프로젝트 설명서
-```
+-----
 
----
-
-## 5. 데이터베이스 스키마
-
-데이터는 **Raw → Mk1 → MK2** 3단계로 관리됩니다.
-
-#### 1. `crypto_24hr_rawingest_landing` (Raw: API 호출 원본 저장)
-
-| 컬럼명           | 타입           | 설명                |
-| :------------ | :----------- | :---------------- |
-| `id`          | BIGSERIAL PK | 호출 고유 ID          |
-| `source`      | TEXT         | 데이터 소스 (예: upbit) |
-| `endpoint`    | TEXT         | API 엔드포인트         |
-| `payload`     | JSONB        | 원본 응답 JSON 전체     |
-| `call_ts`     | TIMESTAMPTZ  | API 호출 시각         |
-| `received_at` | TIMESTAMPTZ  | 수집 완료 시각          |
-
-#### 2. `crypto_24hr_rawingest_events` (Raw: 이벤트 단위 확장 저장)
-
-| 컬럼명           | 타입           | 설명                 |
-| :------------ | :----------- | :----------------- |
-| `id`          | BIGSERIAL PK | 이벤트 고유 ID          |
-| `source`      | TEXT         | 데이터 소스             |
-| `symbol`      | TEXT         | 마켓 코드 (예: KRW-BTC) |
-| `ts_event`    | TIMESTAMPTZ  | 거래소 이벤트 시각         |
-| `payload`     | JSONB        | 원본 이벤트 JSON        |
-| `call_id`     | BIGINT FK    | landing.id 참조      |
-| `received_at` | TIMESTAMPTZ  | 이벤트 수신 시각          |
-
-#### 3. MK1/MK2 레이어
-
-* MK1: 캔들, 체결, 통계 데이터로 정규화
-* MK2: 트렌드, 변동성, ML 기반 예측 결과 저장
-
----
-
-## 6. 설치 및 실행 방법
+## 4\. 설치 및 실행
 
 ### 사전 준비
 
-* Docker 및 Docker Compose 설치
-* Poetry 설치
+  * Docker 및 Docker Compose 설치
+  * Poetry 설치
+  * 프로젝트 루트에 `.env` 파일 생성 (DB 및 Airflow 설정)
 
-### 1단계: 프로젝트 클론 및 의존성 설치
+### 1단계: 프로젝트 클론 및 가상 환경 설정
 
 ```bash
 git clone https://github.com/Daniel08110401/CryptoFlow.git
 cd CryptoFlow
-poetry install
+# pyproject.toml의 Python 버전에 맞는 로컬 Python 환경 설정 (예: pyenv)
+poetry install # 가상 환경 생성 및 모든 의존성 설치
 ```
 
 ### 2단계: Docker 서비스 실행
 
-```bash
-docker compose up -d --build
-```
-
-### 3단계: Django 초기화
+전체 시스템(실시간 + 배치 + API)을 실행합니다.
 
 ```bash
-poetry run python manage.py migrate
-poetry run python manage.py runserver
+docker-compose up --build
 ```
 
-### 4단계: Airflow DAG 실행
+*`--build` 옵션은 `Dockerfile`이나 의존성 변경 시에만 필요합니다.*
 
-* `http://localhost:8080` 접속
-* 계정: `admin / admin`
-* `bitcoin_price_dag` 활성화 및 실행
+### 3단계: Airflow & API 확인
 
----
+  * **Airflow UI**: `http://localhost:8081` (ID/PW: `admin`/`admin`)
+  * **Django API (실시간)**: `http://localhost:8000/api/realtime-price/`
+  * **Django API (배치)**: `http://localhost:8000/api/market-stats/?symbol=KRW-BTC`
 
-## 7. 데이터 확인 및 산출물
+-----
 
-### PostgreSQL 접속
+## 5\. 프로젝트 로드맵
 
-```bash
-docker compose exec postgres psql -U crypto -d cryptoflow
-```
-
-### 데이터 확인 예시
-
-```sql
-SELECT symbol, ts_event, payload->>'trade_price' AS trade_price
-FROM crypto_24hr_rawingest_events
-ORDER BY ts_event DESC LIMIT 10;
-```
-
-### 대시보드
-
-* 추후 Plotly/Dash 기반으로 실시간 차트 제공
-
----
-
-## 8. 프로젝트 로드맵
-
-* [x] Docker 기반 Postgres, Airflow, Django 연결
-* [x] Bronze 테이블 설계
-* [x] Airflow DAG 구현 (배치 수집)
-* [x] Kafka Producer & Redis Consumer 구축 (실시간 수집)
-* [ ] MK1 → MK2 ETL 파이프라인
-* [ ] Django REST API 완성
-* [ ] 대시보드 시각화
-* [ ] Slack/Web 알림 이벤트 추가
+  * [x] **Hot Path**: 실시간 스트리밍 파이프라인 (`WebSocket` → `Kafka` → `Redis`) 구축
+  * [x] **Cold Path (ELT)**: Airflow 기반 데이터 레이크 및 데이터 마트 구축
+  * [x] **Docker**: 전체 서비스 컨테이너화 및 `docker-compose` 환경 구축
+  * [x] **API (기본)**: `Redis` 및 `PostgreSQL` 연동 API 엔드포인트 구현 (DRF)
+  * [x] **API (고도화)**: 페이지네이션 및 필터링 기능 적용
+  * [x] **비동기 작업**: `Celery` 및 `Celery Beat` 연동 (주기적 MA Cross 분석)
+  * [ ] **알림 기능**: Celery Task와 이메일/Slack을 연동하여 실제 알림 발송
+  * [ ] **ML 파이프라인**: (EDA 완료) ML 모델 학습 및 `/api/predict` 엔드포인트 구현
+  * [ ] **대시보드**: Django Template 또는 `Streamlit`/`Dash`를 이용한 시각화
+  * [ ] **테스트**: Django 단위 테스트 및 통합 테스트 코드 작성
