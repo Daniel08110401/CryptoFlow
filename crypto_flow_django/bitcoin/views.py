@@ -1,7 +1,8 @@
-
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.response import Response
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from .services_cache import get_realtime_ticker_from_redis
 from .models import MarketStats24h
 from .serializers import MarketStats24hSerializer
@@ -25,7 +26,8 @@ class RealtimePriceView(APIView):
             return Response({"error": f"No realtime data for {market}"}, status=404)
 
 
-# Batch data views
+# Batch data views (cache logic is applied)
+@method_decorator(cache_page(60 * 10), name='get')
 class MarketStatsView(ListAPIView):
     """
     market_stats_24h 테이블의 모든 데이터를 조회하는 API view
@@ -37,6 +39,7 @@ class MarketStatsView(ListAPIView):
     filterset_class = MarketStatsFilter
 
 # Speciic market data views
+@method_decorator(cache_page(60 * 10), name='get')
 class MarketStatsSpecificMarketView(RetrieveAPIView):
     """
     특정 마켓(market_symbol) 하나의 24시간 통계 데이터를 조회하는 API view

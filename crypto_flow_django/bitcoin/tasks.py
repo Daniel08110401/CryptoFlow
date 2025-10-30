@@ -1,15 +1,33 @@
 import pandas as pd
 from celery import shared_task
-from django.db import connection # Django ORM 대신 직접 SQL 실행 시 사용 가능
+from django.db import connection
+from django.core.mail import send_mail
+from django.conf import settings
 import logging
 
 logger = logging.getLogger(__name__)
+
+def send_notification_email(subject, message_body):
+    """
+    알림 메일 보내는 function
+    """
+    try:
+        send_mail(
+            subject,
+            message_body,
+            settings.DEFAULT_FROM_EMAIL,
+            ['hairu2908@gmail.com'],
+            fail_silently=False,
+        )
+        logger.info(f"Successfully sent email notification: {subject}")
+    except Exception as e:
+        logger.error(f"Failed to send email: {e}", exc_info=True)
 
 @shared_task
 def check_moving_average_cross(symbol="KRW-BTC", short_window=5, long_window=20):
     """
     PostgreSQL에서 특정 심볼의 최근 데이터를 읽어와
-    단기 이동평균선과 장기 이동평균선의 교차(cross)를 확인하는 Celery Task.
+    단기 이동평균선과 장기 이동평균선의 교차(cross)를 확인하는 Celery Task
     """
     logger.info(f"Checking MA cross for {symbol}...")
 
@@ -17,7 +35,6 @@ def check_moving_average_cross(symbol="KRW-BTC", short_window=5, long_window=20)
     required_rows = long_window + 1
 
     try:
-        # Airflow Hook 대신 Django의 connection 사용
         with connection.cursor() as cursor:
             # SQL 쿼리 (psycopg2의 %s 플레이스홀더 사용)
             sql = f"""
@@ -35,9 +52,7 @@ def check_moving_average_cross(symbol="KRW-BTC", short_window=5, long_window=20)
             logger.warning(f"Not enough data for {symbol} to calculate MA cross. Found {len(records)} records.")
             return
 
-        # Pandas DataFrame으로 변환 (최신 데이터가 위쪽에 있음)
         df = pd.DataFrame(records, columns=['ts_event', 'price'])
-        # 시간순으로 다시 정렬 (오래된 데이터가 위로 가도록)
         df = df.sort_values('ts_event').reset_index(drop=True)
 
         # 이동 평균 계산
@@ -62,11 +77,19 @@ def check_moving_average_cross(symbol="KRW-BTC", short_window=5, long_window=20)
         dead_cross = (prev_ma_short >= prev_ma_long) and (curr_ma_short < curr_ma_long)
 
         if golden_cross:
-            logger.warning(f"📈 GOLDEN CROSS DETECTED for {symbol} at {df_check.iloc[1]['ts_event']}!")
-            # 여기에 실제 알림 로직 추가 가능 (예: 이메일 발송, 슬랙 메시지 등)
+            #logger.warning(f"📈 GOLDEN CROSS DETECTED for {symbol} at {df_check.iloc[1]['ts_event']}!")
+            event_time = df_check.iloc[1]['ts_event']
+            subject = f"📈 골든 크로스 발생! ({symbol})"
+            message = f"{symbol}의 단기 이동평균선({short_window}p)이 장기 이동평균선({long_window}p)을 상향 돌파했습니다.\n\n이벤트 발생 시각: {event_time}\n현재 단기MA: {curr_ma_short:,.0f}\n현재 장기MA: {curr_ma_long:,.0f}"
+            logger.warning(subject)
+            send_notification_email(subject, message)
         elif dead_cross:
-            logger.warning(f"📉 DEAD CROSS DETECTED for {symbol} at {df_check.iloc[1]['ts_event']}!")
-            # 여기에 실제 알림 로직 추가
+            #logger.warning(f"📉 DEAD CROSS DETECTED for {symbol} at {df_check.iloc[1]['ts_event']}!")
+            event_time = df_check.iloc[1]['ts_event']
+            subject = f"📉 데드 크로스 발생! ({symbol})"
+            message = f"{symbol}의 단기 이동평균선({short_window}p)이 장기 이동평균선({long_window}p)을 하향 돌파했습니다.\n\n이벤트 발생 시각: {event_time}\n현재 단기MA: {curr_ma_short:,.0f}\n현재 장기MA: {curr_ma_long:,.0f}"
+            logger.warning(subject)
+            send_notification_email(subject, message)
         else:
             logger.info(f"No MA cross detected for {symbol}.")
 

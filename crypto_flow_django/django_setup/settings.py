@@ -86,11 +86,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # CELERY
 # Redis를 메시지 브로커로 사용
 # Docker 환경에서는 서비스 이름 'redis'를 사용
-CELERY_BROKER_URL = f"redis://{os.environ.get('REDIS_HOST', 'localhost')}:6379/1"
+CELERY_REDIS_DB = '1'
+CELERY_BROKER_URL = f"redis://{os.environ.get('REDIS_HOST', 'localhost')}:6379/{CELERY_REDIS_DB}"
 # 작업 결과를 Redis에 저장 (상태 추적에 유용)
 CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 CELERY_ACCEPT_CONTENT = ['json']
@@ -111,6 +111,19 @@ CELERY_BEAT_SCHEDULE = {
     # 다른 주기적 Task가 있다면 여기에 추가
 }
 
+REDIS_HOST = os.environ.get('REDIS_HOST', 'localhost')
+CACHE_REDIS_DB = '2'
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": f"redis://{REDIS_HOST}:6379/{CACHE_REDIS_DB}",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+
 REST_FRAMEWORK = {
     # 기본 페이지네이션 클래스 설정
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
@@ -119,7 +132,27 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend'
     ],
+
+    'DEFAULT_THROTTLE_CLASSES': [
+        # 인증된 사용자는 유저별로, 익명 사용자는 IP별로 제한
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle'
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '50/minute',  # 익명 사용자: 50requests/min
+        'user': '100/minute' # 인증된 사용자: 100 requests/min
+    }
 }
+
+# EMAIL SETTINGS (for MailHog in Docker)
+# 이메일 백엔드를 콘솔 대신 SMTP로 설정
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# MailHog 컨테이너의 서비스 이름과 포트
+EMAIL_HOST = 'mailhog'
+EMAIL_PORT = 1025
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = False
+DEFAULT_FROM_EMAIL = 'admin@cryptoflow.com' # 기본 발신자 주소 
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
