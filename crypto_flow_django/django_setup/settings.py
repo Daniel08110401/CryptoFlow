@@ -106,7 +106,6 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'bitcoin.tasks.check_moving_average_cross', # 실행할 Task 경로
         'schedule': 600.0,  # 실행 간격 (초 단위, 600초 = 10분)
         'args': ('KRW-BTC', 5, 20), # Task에 전달할 인자 (symbol, short, long)
-        # 'kwargs': {'symbol': 'KRW-BTC'} # 또는 키워드 argument 전달
     },
     # 다른 주기적 Task가 있다면 여기에 추가
 }

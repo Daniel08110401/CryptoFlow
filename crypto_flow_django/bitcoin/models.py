@@ -1,4 +1,5 @@
 from django.db import models
+import sys
 
 class MarketStats24h(models.Model):
     """
@@ -15,6 +16,8 @@ class MarketStats24h(models.Model):
 
     class Meta:
         managed = False  # False -> 이미 존재하는 테이블을 읽기만 진행
+        if 'test' in sys.argv:
+            managed = True
         db_table = 'market_stats_24h'  # 실제 DB 테이블 이름 명시
         verbose_name = '24시간 마켓 통계 (Airflow)'
         verbose_name_plural = verbose_name

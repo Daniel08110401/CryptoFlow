@@ -42,9 +42,9 @@ class MarketStatsView(ListAPIView):
 @method_decorator(cache_page(60 * 10), name='get')
 class MarketStatsSpecificMarketView(RetrieveAPIView):
     """
-    특정 마켓(market_symbol) 하나의 24시간 통계 데이터를 조회하는 API view
+    특정 마켓(symbol) 하나의 24시간 통계 데이터를 조회하는 API view
     """
     queryset = MarketStats24h.objects.all()
     serializer_class = MarketStats24hSerializer
-    lookup_field = 'market_symbol' # URL에서 받을 파라미터 이름을 market_symbol로 지정
+    lookup_field = 'symbol'
 
