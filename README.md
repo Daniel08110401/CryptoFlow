@@ -96,7 +96,7 @@ docker-compose up --build
   * [x] **API (기본)**: `Redis` 및 `PostgreSQL` 연동 API 엔드포인트 구현 (DRF)
   * [x] **API (고도화)**: 페이지네이션 및 필터링 기능 적용
   * [x] **비동기 작업**: `Celery` 및 `Celery Beat` 연동 (주기적 MA Cross 분석)
-  * [ ] **알림 기능**: Celery Task와 이메일/Slack을 연동하여 실제 알림 발송
+  * [x] **알림 기능**: Celery Task와 이메일/Slack을 연동하여 실제 알림 발송
   * [ ] **ML 파이프라인**: (EDA 완료) ML 모델 학습 및 `/api/predict` 엔드포인트 구현
   * [ ] **대시보드**: Django Template 또는 `Streamlit`/`Dash`를 이용한 시각화
-  * [ ] **테스트**: Django 단위 테스트 및 통합 테스트 코드 작성
+  * [x] **테스트**: Django 단위 테스트 및 통합 테스트 코드 작성
