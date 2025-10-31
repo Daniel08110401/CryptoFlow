@@ -80,12 +80,6 @@ docker-compose up --build
 
 *`--build` 옵션은 `Dockerfile`이나 의존성 변경 시에만 필요합니다.*
 
-### 3단계: Airflow & API 확인
-
-  * **Airflow UI**: `http://localhost:8081`
-  * **Django API (example: 실시간)**: `http://localhost:8000/api/realtime-price/`
-  * **Django API (example: 배치)**: `http://localhost:8000/api/market-stats/?symbol=KRW-BTC`
-
 -----
 
 ## 5\. 프로젝트 로드맵
