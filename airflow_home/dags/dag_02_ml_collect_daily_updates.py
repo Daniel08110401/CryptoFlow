@@ -131,7 +131,7 @@ def load_fng_data_to_datalake(api_response: list):
 
 # --- DAG 정의 ---
 with DAG(
-    dag_id="dag_04_ml_collect_daily_updates",
+    dag_id="dag_02_ml_collect_daily_updates",
     start_date=pendulum.datetime(2023, 1, 1, tz="Asia/Seoul"),
     # 매일 자정(00:00)에 실행되도록 설정
     schedule="@daily", 
