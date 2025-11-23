@@ -32,8 +32,8 @@ class UpbitTradeSchema(BaseModel):
     """Schema for real-time trade data."""
     type: str = Field(alias="type")
     symbol: str = Field(alias="code")
-    price: float = Field(alias="trade_price")
-    volume: float = Field(alias="trade_volume")
+    trade_price: float = Field(alias="trade_price")
+    trade_volume: float = Field(alias="trade_volume")
     side: Literal["ASK", "BID"] = Field(alias="ask_bid")
     timestamp: datetime = Field(alias="trade_timestamp")
 

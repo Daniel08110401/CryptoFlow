@@ -32,8 +32,10 @@ class UpbitWebsocketProducer:
     Upbit WebSocket에 연결하여 데이터를 수신하고 Kafka로 전송하는 Producer 클래스
     """
     def __init__(self):
+        # linger_ms: 메시지를 즉시 보내지 않고 설정한 시간(ms)만큼 모았다가 보냄 (처리량 증대)
         self._producer = AIOKafkaProducer(
-            bootstrap_servers=settings.KAFKA_BOOTSTRAP_SERVERS
+            bootstrap_servers=settings.KAFKA_BOOTSTRAP_SERVERS,
+            linger_ms=10  
         )
         # 데이터 타입과 Kafka 토픽을 매핑
         self._topic_map = {
@@ -48,58 +50,13 @@ class UpbitWebsocketProducer:
             "orderbook": UpbitOrderbookSchema,
         }
 
-    # async def _handle_message(self, message: str):
-    #     """
-    #     수신된 메시지를 파싱, 검증하고 적절한 Kafka 토픽으로 전송
-    #     """
-    #     try:
-    #         logging.info("--> STEP 1: Received message from Upbit.")
-
-    #         # logging.info(f"RAW DATA: {message}") 
-
-    #         # 1.  JSON 딕셔너리로 파싱
-    #         raw_data = json.loads(message)
-            
-    #         # 2. 'ty' 필드로 메시지 타입 확인
-    #         msg_type = raw_data.get("ty")
-            
-    #         # 3. 타입에 맞는 스키마를 맵에서 가져오기
-    #         SchemaModel = self._schema_map.get(msg_type)
-            
-    #         if not SchemaModel:
-    #             # 처리하기로 한 타입이 아니면 무시
-    #             return
-
-    #         # 4. 해당 스키마로 데이터 검증
-    #         data = SchemaModel.model_validate(raw_data)
-            
-    #         # 데이터 타입에 맞는 토픽을 가져옴
-    #         topic = self._topic_map.get(type(data))
-    #         if not topic:
-    #             logging.warning(f"No topic mapping for data type: {type(data)}")
-    #             return
-            
-    #         logging.info(f"--> STEP 2: Sending validated '{data.type}' data for {data.symbol} to Kafka topic '{topic}'.")
-
-    #         await self._producer.send_and_wait(
-    #             topic, 
-    #             data.model_dump_json().encode('utf-8')
-    #         )
-
-    #         logging.info("--> STEP 3: Successfully sent message to Kafka.")
-            
-    #     except ValidationError as e:
-    #         #print(f"Validation Error: {e}\nRaw Message: {message[:200]}...")
-    #         logging.error(f"Validation Error: {e}")
-    #     except Exception as e:
-    #         # 더 자세한 에러를 볼 수 있도록 수정
-    #         logging.error(f"An unexpected error occurred in producer: {e.__class__.__name__} - {e}", exc_info=True)
+    
     async def _handle_message(self, message: str):
         """
-        수신된 메시지를 파싱, 검증하고 적절한 Kafka 토픽으로 전송
+        수신된 메시지를 파싱, 검증하고 지정한 Kafka 토픽으로 전송
         """
         try:
-            logging.info("--> STEP 1: Received message from Upbit.")
+            #logging.info("--> STEP 1: Received message from Upbit.")
             
             raw_data = json.loads(message)
             msg_type = raw_data.get("type") # 'ty'가 아니라 'type'일 수 있으므로 확인
@@ -115,22 +72,30 @@ class UpbitWebsocketProducer:
                     logging.warning(f"No topic mapping for data type: {type(data)}")
                     return
                 
-                logging.info(f"--> STEP 2: Sending validated '{data.type}' data for {data.symbol} to Kafka topic '{topic}'.")
+                logging.info(f"Sending validated '{data.type}' data for {data.symbol} to Kafka topic '{topic}'.")
                 
-                await self._producer.send_and_wait(
-                    topic, 
-                    data.model_dump_json().encode('utf-8')
+                # await self._producer.send_and_wait(
+                #     topic, 
+                #     data.model_dump_json(by_alias=False).encode('utf-8') # 내부 필드명(symbol, trade_price)으로 통일해서 전송
+                # )
+
+                # send_and_wait -> send 메서드로 변경
+                # 브로커의 Ack를 기다리지 않고 내부 버퍼에 넣고 즉시 리턴 (Throughput 향상)
+                # 데이터 정합성보다 실시간 처리량이 중요할 때 사용
+                await self.producer.send(
+                    topic,
+                    data.model_dump_json(by_alias=False).encode('utf-8')
                 )
-                
-                logging.info("--> STEP 3: Successfully sent message to Kafka.")
+
+                logging.info("Successfully sent message to Kafka.")
             else:
                 # 스키마가 없는 메시지는 로그를 남기고 무시
-                logging.warning(f"--> SKIPPING: No schema found for message type '{msg_type}'. Raw data: {message[:300]}")
-            
+                pass
         except ValidationError as e:
             logging.error(f"Validation Error: {e}\nRaw Message: {message[:300]}...")
         except Exception as e:
-            logging.error(f"An unexpected error occurred in producer: {e.__class__.__name__} - {e}", exc_info=True)
+            logging.error(f"An unexpected error occurred in producer: {e.__class__.__name__} - {e}", exc_info=True)            
+       
 
     async def run(self):
         """
@@ -144,29 +109,38 @@ class UpbitWebsocketProducer:
             {"type": "ticker", "codes": ["KRW-BTC"]},
             {"type": "orderbook", "codes": ["KRW-BTC"]},
         ]
+
+        retry_delay = 1
+        max_retry_delay = 60 # 최대 60초까지만 늘어남
         
-        while True:
+        while True: # to maintain persistent connection even after a connection failure
             try:
                 async with websockets.connect(settings.UPBIT_WEBSOCKET_URL) as websocket:
-                    #print("WebSocket connected. Sending subscription request...")
+                    
                     logging.info("WebSocket connected, Sending subscription request")
                     await websocket.send(json.dumps(subscribe_message))
+
+                    retry_delay = 1
                     logging.info("Subscription request sent.")
                     
                     async for message in websocket:
                         await self._handle_message(message)
                         
-            except ConnectionClosed as e:
-                logging.error(f"WebSocket connection closed: {e}. Reconnecting in 5 seconds...")
-                await asyncio.sleep(5)
-            except Exception as e:
-                logging.error(f"An error occurred in run loop: {e.__class__.__name__} - {e}. Reconnecting in 5 seconds...")
-                await asyncio.sleep(5)
+            except (ConnectionClosed, Exception) as e:
+                # 연결이 끊기거나 에러 발생 시 로그 출력
+                logging.error(f"Connection lost or error: {e}. Reconnecting in {retry_delay} seconds...")
+                
+                # 지수 백오프 적용
+                await asyncio.sleep(retry_delay)
+                
+                # 다음 대기 시간은 현재의 2배 (최대값 max_retry_delay 제한)
+                retry_delay = min(retry_delay * 2, max_retry_delay)
                 
     async def close(self):
         """
         Kafka Producer를 종료
         """
-        print("Stopping Kafka producer...")
+        logging.info("Stopping Kafka producer...")
+        # 종료 시에는 남아있는 메시지를 모두 보내기 위해 flush()가 내부적으로 호출됨
         await self._producer.stop()
-        print("Producer stopped.")
+        logging.info("Producer stopped.")
