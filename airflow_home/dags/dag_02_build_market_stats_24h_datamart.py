@@ -10,7 +10,7 @@ from airflow.providers.postgres.hooks.postgres import PostgresHook
 def transform_and_load_datamart():
     """
     Transform: 데이터 레이크의 원본 데이터를 가공하여 데이터 마트에 적재
-    Task는 Truncate-Load 패턴을 사용
+    Truncate-Load 패턴을 사용하여 일 단위 마켓별 최신 데이터만 적재
     """
     pg_hook = PostgresHook(postgres_conn_id="crypto_flow_postgres")
     
@@ -27,17 +27,23 @@ def transform_and_load_datamart():
         source, 
         ts_event
     )
-    SELECT
+    SELECT DISTINCT ON (payload ->> 'market')
         payload ->> 'market' AS symbol,
         (payload ->> 'acc_trade_price_24h')::NUMERIC AS acc_trade_price_24hr,
         (payload ->> 'acc_trade_volume_24h')::NUMERIC AS acc_trade_volume_24hr,
         'upbit' AS source,
         -- Upbit timestamp는 millisecond 단위이므로 1000으로 나눠서 초 단위로 변환
-        TO_TIMESTAMP((payload ->> 'timestamp')::BIGINT / 1000) AT TIME ZONE 'UTC' AS ts_event
+        TO_TIMESTAMP((payload ->> 'timestamp')::BIGINT / 1000) AT TIME ZONE 'UTC' AS ts_event,
+        NOW() as created_at
     FROM 
         upbit_api_raw_data_landing
     WHERE 
         endpoint = '/v1/ticker'; -- Ticker 데이터만 선택
+    ORDER BY 
+        (PAYLOAD ->> 'market'), 
+        created_at DESC;
+    
+    COMMIT;
     """
     # PostgresHook을 사용하여 SQL 실행
     pg_hook.run(transform_sql)
