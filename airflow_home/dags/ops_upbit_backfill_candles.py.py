@@ -89,7 +89,7 @@ def extract_fng_historical_data():
 @task(task_id="load_upbit_candles_to_datalake")
 def load_upbit_candles_to_datalake(api_response: dict):
     """
-    [L] 추출된 Upbit 일별 캔들 데이터를 Data Lake 테이블에 적재합니다.
+    [L] 추출된 Upbit 일별 캔들 데이터를 Data Lake 테이블에 적재
     """
     market = api_response.get("market")
     data_list = api_response.get("data")
@@ -122,7 +122,7 @@ def load_upbit_candles_to_datalake(api_response: dict):
 @task(task_id="load_fng_data_to_datalake")
 def load_fng_data_to_datalake(api_response: list):
     """
-    [L] 추출된 F&G Index 데이터를 Data Lake 테이블에 적재합니다.
+    [L] 추출된 F&G Index 데이터를 Data Lake 테이블에 적재
     """
     if not api_response:
         print("No F&G data to load.")
@@ -153,7 +153,7 @@ def load_fng_data_to_datalake(api_response: list):
 
 # --- DAG 정의 ---
 with DAG(
-    dag_id="dag_01_ml_backfill_historical_data",
+    dag_id="ops_upbit_backfill_candles",
     start_date=pendulum.datetime(2023, 1, 1, tz="Asia/Seoul"),
     # 이 DAG는 수동 실행을 위한 것이므로, 스케줄을 'None'으로 설정
     schedule=None,

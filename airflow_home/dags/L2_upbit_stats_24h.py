@@ -49,7 +49,7 @@ def transform_and_load_datamart():
     pg_hook.run(transform_sql)
 
 with DAG(
-    dag_id="dag_03_build_datamart",
+    dag_id="L2_upbit_stats_24h",
     start_date=pendulum.datetime(2023, 1, 1, tz="Asia/Seoul"),
     # 이전 DAG가 10분마다 실행되므로, 5분 뒤에 실행하여 데이터 정합성을 맞춤
     schedule="5-59/10 * * * *", 

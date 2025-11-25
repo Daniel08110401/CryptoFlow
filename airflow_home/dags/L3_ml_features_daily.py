@@ -122,7 +122,7 @@ def build_features_and_load():
     print("Done.")
 
 with DAG(
-    dag_id="dag_03_ml_build_datamart",
+    dag_id="L3_ml_features_daily",
     start_date=pendulum.datetime(2023, 1, 1, tz="Asia/Seoul"),
     schedule="30 0 * * *", # 매일 00:30 (수집 DAG보다 30분 뒤 실행)
     catchup=False,

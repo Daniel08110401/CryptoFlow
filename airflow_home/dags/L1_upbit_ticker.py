@@ -83,7 +83,7 @@ def load_raw_data_to_postgres(api_response: dict):
     )
 
 with DAG(
-    dag_id="dag_01_build_upbit_datalake", # DAG ID 파일명과 일치 권장
+    dag_id="L1_upbit_ticker", # DAG ID 파일명과 일치 권장
     start_date=pendulum.datetime(2023, 1, 1, tz="Asia/Seoul"),
     schedule="*/10 * * * *",  # 10분마다 실행
     catchup=False,
