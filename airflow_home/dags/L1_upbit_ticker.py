@@ -4,12 +4,14 @@ import json
 import pendulum
 import requests
 import time
-
+from airflow.datasets import Dataset
 from airflow.models.dag import DAG
 from airflow.decorators import task
 from airflow.providers.postgres.hooks.postgres import PostgresHook
 
-@task(task_id="extract_upbit_ticker_data")
+UPBIT_TICKER_DATASET = Dataset("upbit://daily_tickers")
+
+@task(task_id="extract_upbit_ticker_data", outlets = UPBIT_TICKER_DATASET)
 def extract_upbit_data():
     """
     Extract: Upbit API에서 KRW 마켓 Ticker 데이터를 Chunk 단위로 가져와 병합

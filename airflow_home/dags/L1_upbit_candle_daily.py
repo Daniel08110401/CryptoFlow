@@ -5,14 +5,16 @@ import requests
 import pendulum
 from airflow import DAG
 from airflow.decorators import task
+from airflow.datasets import Dataset
 from airflow.providers.postgres.hooks.postgres import PostgresHook
 
 # Upbit 종가는 한국 시간 오전 9시에 갱신됨
+UPBIT_CANDLE_DATASET = Dataset("upbit://daily_candles")
 UPBIT_MARKET_URL = "https://api.upbit.com/v1/market/all"
 UPBIT_CANDLE_URL = "https://api.upbit.com/v1/candles/days"
 HEADERS = {"accept": "application/json"}
 
-@task(task_id="collect_daily_candles_200d")
+@task(task_id="collect_daily_candles_200d", outlets=[UPBIT_CANDLE_DATASET])
 def collect_daily_candles_200d():
     """
     모든 KRW 마켓의 최근 200일 치 일봉을 수집하여 Raw Data 테이블에 적재
@@ -55,7 +57,8 @@ def collect_daily_candles_200d():
 with DAG(
     dag_id="L1_upbit_candle_daily", # 기존 01과 구분
     start_date=pendulum.datetime(2023, 1, 1, tz="Asia/Seoul"),
-    schedule="10 9 * * *", # 매일 09:10 실행 (종가 확정 후)
+    #schedule="10 9 * * *", # 매일 09:10 실행 (종가 확정 후)
+    schedule="*/2 * * * *", # 테스트, 2분마다 진행
     catchup=False,
     tags=["lake", "daily", "EL"],
 ) as dag:

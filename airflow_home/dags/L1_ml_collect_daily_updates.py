@@ -9,6 +9,8 @@ from airflow.models.dag import DAG
 from airflow.decorators import task
 from airflow.providers.postgres.hooks.postgres import PostgresHook
 from airflow.exceptions import AirflowFailException
+from airflow.datasets import Dataset
+
 
 PG_CONN_ID = "crypto_flow_postgres"
 

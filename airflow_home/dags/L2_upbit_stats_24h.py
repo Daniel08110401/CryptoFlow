@@ -1,10 +1,11 @@
 from __future__ import annotations
-
 import pendulum
-
+from airflow.datasets import Dataset
 from airflow.models.dag import DAG
 from airflow.decorators import task
 from airflow.providers.postgres.hooks.postgres import PostgresHook
+
+UPBIT_TICKER_DATASET = Dataset("upbit://daily_tickers")
 
 @task(task_id="transform_and_load_datamart")
 def transform_and_load_datamart():
@@ -52,7 +53,8 @@ with DAG(
     dag_id="L2_upbit_stats_24h",
     start_date=pendulum.datetime(2023, 1, 1, tz="Asia/Seoul"),
     # 이전 DAG가 10분마다 실행되므로, 5분 뒤에 실행하여 데이터 정합성을 맞춤
-    schedule="5-59/10 * * * *", 
+    #schedule="5-59/10 * * * *", 
+    schedule=[UPBIT_TICKER_DATASET],
     catchup=False,
     tags=["upbit", "datamart", "ELT"],
     doc_md="""
