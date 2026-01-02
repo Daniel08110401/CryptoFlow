@@ -1,7 +1,7 @@
 # crypto_flow_django/bitcoin/serializers.py
 
 from rest_framework import serializers
-from .models import MarketStats24h
+from .models import MarketStats24h, DailyMarketTrend
 
 class MarketStats24hSerializer(serializers.ModelSerializer):
     """
@@ -18,3 +18,8 @@ class MarketStats24hSerializer(serializers.ModelSerializer):
             'ts_event', 
             'created_at'
         ]
+
+class DailyTrendSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DailyMarketTrend
+        fields = '__all__' # 모든 필드를 다 보여줌

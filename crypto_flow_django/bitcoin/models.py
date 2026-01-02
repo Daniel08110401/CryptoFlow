@@ -22,53 +22,23 @@ class MarketStats24h(models.Model):
         verbose_name = '24시간 마켓 통계 (Airflow)'
         verbose_name_plural = verbose_name
 
-# class SpotSnapshot(models.Model):
-#     symbol = models.CharField(max_length=32, db_index=True)
-#     price = models.DecimalField(max_digits=20, decimal_places=8)   # KRW/BTC면 KRW 단위
-#     quote_ccy = models.CharField(max_length=8, default="KRW")      # 'KRW' | 'USD'
-#     source = models.CharField(max_length=32, default="upbit")
-#     ts_event = models.DateTimeField(db_index=True)                 # 거래소/응답 기준 시각
-#     ts_ingested = models.DateTimeField(auto_now_add=True)
+class DailyMarketTrend(models.Model):
+    """
+    Airflow L2 DAG가 매일 아침 생성하는 '오늘의 추세 리포트' 테이블
+    managed = False 옵션을 사용하여 Django가 테이블을 새로 만들거나 건드리지 않게 합니다.
+    """
+    symbol = models.CharField(max_length=20, primary_key=True)
+    close_price = models.DecimalField(max_digits=20, decimal_places=4)
+    ma_5 = models.DecimalField(max_digits=20, decimal_places=4)
+    ma_20 = models.DecimalField(max_digits=20, decimal_places=4)
+    ma_60 = models.DecimalField(max_digits=20, decimal_places=4)
+    rsi_14 = models.DecimalField(max_digits=10, decimal_places=2) # 새로 추가됨
+    is_golden_cross = models.BooleanField()
+    trend_score = models.IntegerField()
+    created_at = models.DateTimeField()
 
-# class Candle(models.Model):
-#     symbol = models.CharField(max_length=32, db_index=True)        # 'BTC-USD' 등
-#     interval = models.CharField(max_length=8)                      # '1h','1d'
-#     open = models.DecimalField(max_digits=20, decimal_places=8)
-#     high = models.DecimalField(max_digits=20, decimal_places=8)
-#     low = models.DecimalField(max_digits=20, decimal_places=8)
-#     close = models.DecimalField(max_digits=20, decimal_places=8)
-#     volume = models.DecimalField(max_digits=24, decimal_places=8, null=True)
-#     ts_open = models.DateTimeField(db_index=True)
-#     source = models.CharField(max_length=32, default="coinpaprika")
-#     ts_ingested = models.DateTimeField(auto_now_add=True)
-
-#     class Meta:
-#         unique_together = ("symbol", "interval", "ts_open", "source")
-
-
-# class Crypto24hRawIngestLanding(models.Model):
-#     source = models.CharField(max_length=32)
-#     endpoint = models.CharField(max_length=64)
-#     request_params = models.JSONField(null=True, blank=True)
-#     http_status = models.IntegerField()
-#     headers = models.JSONField()
-#     payload = models.JSONField()
-#     received_at = models.DateTimeField(db_index=True)
-#     duration_ms = models.IntegerField()
-
-#     class Meta:
-#         db_table = "crypto_24hr_rawingest_landing"
-
-# class Crypto24hRawIngestEvent(models.Model):
-#     source = models.CharField(max_length=32)
-#     symbol = models.CharField(max_length=128)
-#     ts_event = models.DateTimeField(db_index=True)
-#     payload = models.JSONField()
-#     call = models.ForeignKey(Crypto24hRawIngestLanding, on_delete=models.CASCADE, db_column="call_id")
-#     received_at = models.DateTimeField(auto_now_add=True)
-
-#     class Meta:
-#         db_table = "crypto_24hr_rawingest_events"
-
-
-
+    class Meta:
+        managed = False  # [중요] Airflow가 만든 테이블이므로 Django는 읽기만 함 (No Migration)
+        db_table = 'daily_market_trend' # 실제 DB 테이블 이름
+        ordering = ['-trend_score'] # 조회 시 점수 높은 순으로 자동 정렬
+        verbose_name = "Daily Trend Report"

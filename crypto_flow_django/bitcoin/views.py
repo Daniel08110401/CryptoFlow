@@ -1,11 +1,13 @@
+from rest_framework import viewsets, filters
+from rest_framework.decorators import action
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.response import Response
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from .services_cache import get_realtime_ticker_from_redis
-from .models import MarketStats24h
-from .serializers import MarketStats24hSerializer
+from .models import MarketStats24h, DailyMarketTrend
+from .serializers import MarketStats24hSerializer, DailyTrendSerializer
 from .filters import MarketStatsFilter
 
 # Streaming data views
@@ -48,3 +50,22 @@ class MarketStatsSpecificMarketView(RetrieveAPIView):
     serializer_class = MarketStats24hSerializer
     lookup_field = 'symbol'
 
+class TrendReportViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    오늘의 추세 리포트를 조회하는 API
+    GET /api/trend-report/
+    """
+    queryset = DailyMarketTrend.objects.all()
+    serializer_class = DailyTrendSerializer
+
+    # 검색 필터 활성화, ex) /api/trend-report/?search=BTC
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['symbol'] # 'symbol' 컬럼에서 검색
+
+    # [추가 기능] 점수가 높은 순으로 정렬해서 Top 3만 뽑아주는 API
+    # GET /api/trend-report/top-picks/
+    @action(detail=False, methods=['get'], url_path='top-picks')
+    def top_picks(self, request):
+        top_coins = self.queryset.order_by('-trend_score')[:3]
+        serializer = self.get_serializer(top_coins, many=True)
+        return Response(serializer.data)
